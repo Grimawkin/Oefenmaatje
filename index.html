@@ -317,7 +317,7 @@ ul.log .main div:first-child{font-weight:600}
       <select id="sub"><option value="1">geen</option><option value="2">achtsten</option><option value="3">triolen</option><option value="4">zestienden</option></select>
     </div>
     <div class="row"><label class="check"><input type="checkbox" id="accent" checked> Accent op tel 1</label></div>
-    <div class="row"><label for="vol">Volume</label><input type="range" id="vol" min="0" max="100" value="70"></div>
+    <div class="row"><label for="vol">Volume</label><input type="range" id="vol" min="0" max="100" value="85"></div>
   </div>
   <div class="card">
     <h2>Tempoladder</h2>
@@ -380,7 +380,7 @@ ul.log .main div:first-child{font-weight:600}
       <label class="check"><input type="checkbox" id="dFifth"> + kwint</label>
       <label class="check"><input type="checkbox" id="dLow"> + octaaf lager</label>
     </div>
-    <div class="row"><label>Volume</label><input type="range" id="dVol" min="0" max="100" value="45"></div>
+    <div class="row"><label>Volume</label><input type="range" id="dVol" min="0" max="100" value="75"></div>
     <p class="muted" style="margin:10px 0 0" id="dInstrInfo"></p>
   </div>
   <div class="card">
@@ -668,20 +668,28 @@ function clefF(x,y0,sp){
 function highlight(box,i){box.querySelectorAll('.n').forEach(g=>g.classList.toggle('hl',+g.dataset.i===i));}
 
 /* =================== AUDIO =================== */
-let ctx=null,master=null,droneBus=null,synthBus=null;
+let ctx=null,outBus=null,master=null,droneBus=null,synthBus=null;
 function audio(){
   if(!ctx){
+    // iPhone/iPad: speel als "muziek" i.p.v. "systeemgeluid" (luider, en ook met stille modus)
+    try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}
     ctx=new (window.AudioContext||window.webkitAudioContext)();
-    master=ctx.createGain();master.connect(ctx.destination);master.gain.value=$('vol').value/100;
-    droneBus=ctx.createGain();droneBus.connect(ctx.destination);droneBus.gain.value=$('dVol').value/100;
+    // begrenzer: alles flink harder, zonder dat het kraakt
+    outBus=ctx.createGain();outBus.gain.value=2.2;
+    const lim=ctx.createDynamicsCompressor();
+    lim.threshold.value=-8;lim.knee.value=4;lim.ratio.value=16;lim.attack.value=0.002;lim.release.value=0.12;
+    outBus.connect(lim);lim.connect(ctx.destination);
+    master=ctx.createGain();master.connect(outBus);master.gain.value=$('vol').value/100;
+    droneBus=ctx.createGain();droneBus.connect(outBus);droneBus.gain.value=$('dVol').value/100;
   }
   if(ctx.state==='suspended')ctx.resume();
   return ctx;
 }
 function click(time,kind,dest){
   const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type='square';
   o.frequency.value=kind===0?1760:kind===1?1050:700;
-  const peak=kind===2?0.25:kind===0?0.9:0.6;
+  const peak=kind===2?0.2:kind===0?0.6:0.45;
   g.gain.setValueAtTime(0.0001,time);
   g.gain.exponentialRampToValueAtTime(peak,time+0.002);
   g.gain.exponentialRampToValueAtTime(0.0001,time+0.05);
@@ -693,7 +701,7 @@ function brass(freq,time,dur,dest,level){
   o.type='sawtooth';o.frequency.value=freq;
   fl.type='lowpass';fl.Q.value=0.8;
   fl.frequency.setValueAtTime(Math.min(8000,freq*1.5),time);fl.frequency.linearRampToValueAtTime(Math.min(10000,freq*4),time+0.08);
-  const L=level||0.28;
+  const L=level||0.5;
   g.gain.setValueAtTime(0.0001,time);
   g.gain.exponentialRampToValueAtTime(L,time+0.03);
   g.gain.setTargetAtTime(L*0.75,time+0.03,0.15);
@@ -705,7 +713,7 @@ function chime(){
   [[880,0],[1318.5,0.16]].forEach(([f,dt])=>{
     const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;
     g.gain.setValueAtTime(0.0001,t+dt);g.gain.exponentialRampToValueAtTime(0.4,t+dt+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+dt+0.6);
-    o.connect(g);g.connect(ctx.destination);o.start(t+dt);o.stop(t+dt+0.65);
+    o.connect(g);g.connect(outBus);o.start(t+dt);o.stop(t+dt+0.65);
   });
 }
 let wakeLock=null,wakeUsers=0;
@@ -995,8 +1003,8 @@ function startChord(){
   const wasOn=C.on;stopMetro();stopDrone();stopSeq();if(!au.paused)au.pause();
   audio();killNodes(C.nodes);C.nodes=[];
   const root=curChord[0];const f0=hz(sounding(root.m));
-  C.nodes.push(voiceSus(f0/2,0.3));
-  curChord.slice(0,-1).forEach((n,i)=>{if(i!==cState.role)C.nodes.push(voiceSus(f0*RATIO[n.iv],0.2));});
+  C.nodes.push(voiceSus(f0/2,0.55));
+  curChord.slice(0,-1).forEach((n,i)=>{if(i!==cState.role)C.nodes.push(voiceSus(f0*RATIO[n.iv],0.45));});
   if(!wasOn){C.on=true;keepAwake(true);}
   $('cBand').textContent='■ Stop';$('cBand').classList.add('stop');
 }
@@ -1010,7 +1018,7 @@ $('cCompare').addEventListener('click',()=>{
   stopEverything();audio();
   const root=curChord[0];const f0=hz(sounding(root.m));const t=ctx.currentTime+0.1;
   const play=(start,just)=>{
-    const g=ctx.createGain();g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(0.2,start+0.2);g.gain.setTargetAtTime(0.0001,start+2.4,0.1);g.connect(droneBus);
+    const g=ctx.createGain();g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(0.4,start+0.2);g.gain.setTargetAtTime(0.0001,start+2.4,0.1);g.connect(droneBus);
     [f0/2].concat(curChord.slice(0,-1).map(n=>just?f0*RATIO[n.iv]:f0*Math.pow(2,n.iv/12))).forEach(f=>{
       const o=ctx.createOscillator();o.type='triangle';o.frequency.value=f;o.connect(g);o.start(start);o.stop(start+3);
     });
@@ -1299,9 +1307,9 @@ function startDrone(){
   stopSeq();stopChord();
   audio();killNodes(D.nodes);D.nodes=[];
   const s=sounding(droneDisp());
-  D.nodes.push(makeVoice(hz(s),0.35));
-  if($('dFifth').checked)D.nodes.push(makeVoice(hz(s+7),0.2));
-  if($('dLow').checked)D.nodes.push(makeVoice(hz(s-12),0.25));
+  D.nodes.push(makeVoice(hz(s),0.6));
+  if($('dFifth').checked)D.nodes.push(makeVoice(hz(s+7),0.35));
+  if($('dLow').checked)D.nodes.push(makeVoice(hz(s-12),0.45));
   if(!D.on){D.on=true;keepAwake(true);}
   $('dPlay').textContent='■ Stemtoon uit';$('dPlay').classList.add('stop');
 }
