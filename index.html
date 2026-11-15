@@ -144,7 +144,7 @@ ul.log .main div:first-child{font-weight:600}
     <button class="tile" data-go="log"><i>📒</i>Logboek<span>Weekdoel en records</span></button>
     <button class="tile" data-go="instrument"><i>⚙️</i>Instrument<span>Instellingen</span></button>
   </div>
-  <p class="muted" style="text-align:center;margin-top:18px">Versie 3 · 15 november 2026</p>
+  <p class="muted" style="text-align:center;margin-top:18px">Versie 4 · 15 november 2026</p>
 </section>
 
 <!-- INSTRUMENT -->
@@ -504,10 +504,10 @@ const INSTR=[
   {id:'btb',name:'Bastrombone',short:'Bastrombone',t:-14,kind:'slide',lo:54,hi:76,clefs:['bass'],ic:'🎺'},
   {id:'eup',name:'Euphonium in Bes',short:'Euphonium',t:-14,kind:'valves',lo:54,hi:81,clefs:['treble','bass'],ic:'📯'},
   {id:'ebb',name:'Es-bas',short:'Es-bas',t:-21,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'},
-  {id:'bbb',name:'Bes-bas',short:'Bes-bas',t:-26,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'},
-  {id:'perc',name:'Slagwerk',short:'Slagwerk',t:0,kind:'perc',lo:54,hi:79,clefs:['treble'],ic:'🥁'}
+  {id:'bbb',name:'Bes-bas',short:'Bes-bas',t:-26,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'}
 ];
 let cfg=Object.assign({instr:null,clef:'treble',level:1,a4:440},store.get('bo.cfg',{}));
+if(cfg.instr&&!INSTR.some(x=>x.id===cfg.instr))cfg.instr=null; // bv. oud 'slagwerk'
 const I=()=>INSTR.find(x=>x.id===cfg.instr)||INSTR[1];
 const isBass=()=>cfg.clef==='bass'&&I().clefs.includes('bass');
 const shift=()=>isBass()?0:I().t;            // klinkend = display + shift
