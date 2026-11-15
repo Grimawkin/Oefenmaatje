@@ -147,7 +147,7 @@ ul.help li+li{margin-top:8px}
     <button class="tile" data-go="instrument"><i>⚙️</i>Instrument<span>Instellingen</span></button>
     <button class="tile" data-go="hulp"><i>❓</i>Handleiding<span>Zo werkt de app</span></button>
   </div>
-  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 7 · 15 november 2026</p>
+  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 8 · 15 november 2026</p>
 </section>
 
 <!-- HANDLEIDING -->
@@ -166,7 +166,7 @@ ul.help li+li{margin-top:8px}
       <li><b>Instrument:</b> alles wordt erop afgestemd: wat je ziet, wat je hoort en welke grepen erbij staan.</li>
       <li><b>Notatie:</b> baritons, trombones, euphoniums en bassen kiezen tussen <b>g-sleutel</b> (brassband) en <b>f-sleutel in C</b>.</li>
       <li><b>Niveau:</b> Basis (toonladders over één octaaf) of Gevorderd (twee octaven).</li>
-      <li><b>Stemming:</b> standaard A = 440 Hz.</li>
+      <li><b>Stemming:</b> standaard A = 442 Hz. Pas dit aan als je band op een andere stemming speelt.</li>
     </ul>
   </div>
   <div class="card">
@@ -216,7 +216,7 @@ ul.help li+li{margin-top:8px}
       </div>
     </div>
     <div class="row">
-      <label>Stemming A =</label><input type="number" id="iA4" value="440" min="430" max="450"><label>Hz</label>
+      <label>Stemming A =</label><input type="number" id="iA4" value="442" min="430" max="450"><label>Hz</label>
     </div>
   </div>
   <div class="card">
@@ -555,7 +555,9 @@ const INSTR=[
   {id:'ebb',name:'Es-bas',short:'Es-bas',t:-21,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'},
   {id:'bbb',name:'Bes-bas',short:'Bes-bas',t:-26,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'}
 ];
-let cfg=Object.assign({instr:null,clef:'treble',level:1,a4:440},store.get('bo.cfg',{}));
+let cfg=Object.assign({instr:null,clef:'treble',level:1,a4:442},store.get('bo.cfg',{}));
+// eenmalig: oude standaard 440 → nieuwe standaard 442
+if(!cfg.v2){if(+cfg.a4===440)cfg.a4=442;cfg.v2=true;try{localStorage.setItem('bo.cfg',JSON.stringify(cfg));}catch(e){}}
 if(cfg.instr&&!INSTR.some(x=>x.id===cfg.instr))cfg.instr=null; // bv. oud 'slagwerk'
 const I=()=>INSTR.find(x=>x.id===cfg.instr)||INSTR[1];
 const isBass=()=>cfg.clef==='bass'&&I().clefs.includes('bass');
@@ -563,7 +565,7 @@ const shift=()=>isBass()?0:I().t;            // klinkend = display + shift
 const toDisp=tw=>isBass()?tw+I().t:tw;        // g-sleutelnotatie -> eigen notatie
 const toTw=d=>isBass()?d-I().t:d;
 const sounding=d=>d+shift();
-function hz(m){const a=Math.max(400,Math.min(480,+cfg.a4||440));return a*Math.pow(2,(m-69)/12);}
+function hz(m){const a=Math.max(400,Math.min(480,+cfg.a4||442));return a*Math.pow(2,(m-69)/12);}
 function saveCfg(){store.set('bo.cfg',cfg);}
 
 /* =================== NOTENNAMEN =================== */
@@ -851,7 +853,7 @@ function applyInstrument(){
 $('iSel').addEventListener('change',e=>{cfg.instr=e.target.value;cfg.clef=I().clefs[0];stopEverything();applyInstrument();});
 document.querySelectorAll('#iClef button').forEach(b=>b.addEventListener('click',()=>{cfg.clef=b.dataset.v;stopEverything();applyInstrument();}));
 document.querySelectorAll('#iLevel button').forEach(b=>b.addEventListener('click',()=>{cfg.level=+b.dataset.v;applyInstrument();}));
-$('iA4').addEventListener('change',e=>{cfg.a4=Math.max(430,Math.min(450,+e.target.value||440));applyInstrument();});
+$('iA4').addEventListener('change',e=>{cfg.a4=Math.max(430,Math.min(450,+e.target.value||442));applyInstrument();});
 $('frOk').addEventListener('click',()=>{cfg.instr=$('frInstr').value;cfg.clef=I().clefs[0];$('firstRun').style.display='none';applyInstrument();});
 
 /* =================== SPEEL-ENGINE (notenreeks) =================== */
@@ -1317,7 +1319,7 @@ function tunerTick(){
   TU.quiet=0;$('tuBig').classList.remove('tu-dim');
   TU.hist.push(r.f);if(TU.hist.length>5)TU.hist.shift();
   const f=TU.hist.slice().sort((a,b)=>a-b)[TU.hist.length>>1];
-  const a4=Math.max(400,Math.min(480,+cfg.a4||440));
+  const a4=Math.max(400,Math.min(480,+cfg.a4||442));
   const mf=69+12*Math.log2(f/a4);const m=Math.round(mf);const cents=(mf-m)*100;
   const dev=cents-TU.target;
   const disp=m-shift();
