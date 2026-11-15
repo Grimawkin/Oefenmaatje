@@ -106,6 +106,8 @@ ul.log .main div:first-child{font-weight:600}
 #tuGauge{display:block;width:100%;max-width:420px;margin:0 auto}
 #tuNeedle{transition:transform .12s linear}
 .tu-dim{opacity:.35}
+ul.help{margin:0;padding-left:18px;line-height:1.5;font-size:15px}
+ul.help li+li{margin-top:8px}
 .seg button.on{background:var(--brass);color:#1b140a;border-color:var(--brass)}
 </style>
 </head>
@@ -143,8 +145,55 @@ ul.log .main div:first-child{font-weight:600}
     <button class="tile" data-go="loop"><i>🔁</i>Loop<span>Opname vertragen en herhalen</span></button>
     <button class="tile" data-go="log"><i>📒</i>Logboek<span>Weekdoel en records</span></button>
     <button class="tile" data-go="instrument"><i>⚙️</i>Instrument<span>Instellingen</span></button>
+    <button class="tile" data-go="hulp"><i>❓</i>Handleiding<span>Zo werkt de app</span></button>
   </div>
-  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 6 · 15 november 2026</p>
+  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 7 · 15 november 2026</p>
+</section>
+
+<!-- HANDLEIDING -->
+<section id="hulp">
+  <div class="card">
+    <h2>Op je beginscherm zetten</h2>
+    <p class="muted" style="margin:0 0 8px">Dan opent de app als een gewone app en werkt hij ook zonder internet.</p>
+    <ul class="help">
+      <li><b>iPhone/iPad:</b> open de app in Safari, tik op de deelknop en kies <b>Zet op beginscherm</b>.</li>
+      <li><b>Android:</b> open de app in Chrome, tik op het menu (⋮) en kies <b>App installeren</b>.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Instrument</h2>
+    <ul class="help">
+      <li><b>Instrument:</b> alles wordt erop afgestemd: wat je ziet, wat je hoort en welke grepen erbij staan.</li>
+      <li><b>Notatie:</b> baritons, trombones, euphoniums en bassen kiezen tussen <b>g-sleutel</b> (brassband) en <b>f-sleutel in C</b>.</li>
+      <li><b>Niveau:</b> Basis (toonladders over één octaaf) of Gevorderd (twee octaven).</li>
+      <li><b>Stemming:</b> standaard A = 440 Hz.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>De onderdelen</h2>
+    <ul class="help">
+      <li><b>📋 Routine:</b> een oefenplan met timer per onderdeel. Stemtoon en metronoom gaan vanzelf aan. Pas onderdelen aan onder <i>Routine aanpassen</i>. Een afgeronde routine komt in je logboek.</li>
+      <li><b>🌬️ Inblazen:</b> lange tonen, zachte aanzet, lipslurs en een vingeroefening, met noten en grepen op het scherm.</li>
+      <li><b>🎼 Toonladders:</b> majeur, mineur en chromatisch, met voortekening en grepen. De noot die klinkt kleurt mee. Tik op <b>Gehaald</b> om je tempo vast te leggen.</li>
+      <li><b>🎶 Akkoorden:</b> kies of jij grondtoon, terts of kwint speelt. <b>Band speelt mee</b> laat de andere tonen klinken. <b>Hoor het verschil</b> laat getemperd en zuiver na elkaar horen.</li>
+      <li><b>🎯 Stemapparaat:</b> druk op Start en sta de microfoon toe. Je ziet de noot zoals jij hem leest. Speel je in een akkoord, kies dan bij <i>Waar mik je op?</i> een doel.</li>
+      <li><b>🎵 Stemtoon:</b> een aanhoudende toon om op gehoor te stemmen. De knoppen Stem-Bes, Stem-A en Stem-F laten zien welke noot jij speelt.</li>
+      <li><b>⏱️ Metronoom:</b> met maatsoort, onderverdeling en tempoladder. De tempoladder versnelt vanzelf van je begin- naar je eindtempo.</li>
+      <li><b>🔁 Loop:</b> laad een opname, zet A en B rond een lastige passage en verlaag de snelheid. De toonhoogte blijft gelijk.</li>
+      <li><b>📒 Logboek:</b> oefentijd, weekdoel en tempo-records. Routines en toonladders vullen het automatisch.</li>
+    </ul>
+    <p class="muted" style="margin:10px 0 0">Bij toonladders, inblazen en akkoorden kies je onder <i>Oefenen</i> zelf het tempo, of de app meespeelt of alleen tikt, en of hij herhaalt met elke keer een paar bpm erbij.</p>
+  </div>
+  <div class="card">
+    <h2>Tips en veelgestelde vragen</h2>
+    <ul class="help">
+      <li><b>Het geluid is te zacht.</b> Zet het volume van je telefoon of tablet zelf hoger. Bij de metronoom en de stemtoon zitten ook volumeschuiven.</li>
+      <li><b>Het stemapparaat doet niets.</b> Sta de microfoon toe als de browser erom vraagt. Heb je eerder "Niet toestaan" gekozen, zet de microfoon dan aan in de instellingen van je browser.</li>
+      <li><b>Heb ik de nieuwste versie?</b> Onderaan het startscherm staat het versienummer. Een update komt binnen als je de app helemaal sluit en weer opent. Soms moet dat twee keer.</li>
+      <li><b>Waar blijven mijn gegevens?</b> Je logboek, routines en instellingen staan alleen op je eigen apparaat. Er gaat niets naar een server.</li>
+      <li><b>Vragen of ideeën?</b> Laat het Rudi weten.</li>
+    </ul>
+  </div>
 </section>
 
 <!-- INSTRUMENT -->
@@ -744,7 +793,7 @@ async function keepAwake(on){
 function stopEverything(){stopMetro();stopDrone();stopSeq();stopChord();stopTuner();if(!au.paused)au.pause();}
 
 /* =================== NAVIGATIE =================== */
-const TITLES={home:'Je oefencoach voor alle koperblazers',instrument:'Instrument',toonladders:'Toonladders',akkoorden:'Akkoorden',inblazen:'Inblazen',routine:'Routine',metro:'Metronoom',drone:'Stemtoon',loop:'Loop',log:'Logboek',tuner:'Stemapparaat'};
+const TITLES={home:'Je oefencoach voor alle koperblazers',instrument:'Instrument',toonladders:'Toonladders',akkoorden:'Akkoorden',inblazen:'Inblazen',routine:'Routine',metro:'Metronoom',drone:'Stemtoon',loop:'Loop',log:'Logboek',tuner:'Stemapparaat',hulp:'Handleiding'};
 function go(id){
   if(!TITLES[id])id='home';
   stopSeq();stopChord();if(id!=='tuner')stopTuner();
