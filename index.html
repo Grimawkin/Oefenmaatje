@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brassband Oefenmaatje</title>
+<meta name="theme-color" content="#14110d">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Oefenmaatje">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+:root{--bg:#14110d;--card:#211c16;--line:#3a3128;--text:#f3ece2;--muted:#a89a88;--brass:#e0a93b;--brass2:#f5c96a;--ok:#7cc48a;--warn:#e07a5f}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+header{max-width:760px;margin:0 auto;padding:16px 16px 4px;display:flex;align-items:center;gap:10px}
+header .ttl{flex:1}
+h1{font-size:20px;margin:0;letter-spacing:.2px}
+h1 span{color:var(--brass)}
+header p{margin:2px 0 0;color:var(--muted);font-size:13px}
+#back{display:none}
+main{max-width:760px;margin:0 auto;padding:10px 16px 48px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 10px;color:var(--brass2);font-weight:600}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row+.row{margin-top:10px}
+label{font-size:14px;color:var(--muted)}
+input[type=number],input[type=text],select,textarea{background:#16120e;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:16px}
+input[type=number]{width:80px}
+textarea{width:100%;min-height:60px;font-family:inherit}
+input[type=range]{flex:1;accent-color:var(--brass);min-width:140px}
+button.b{padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#2c251d;color:var(--text);font-size:15px;font-weight:600}
+button.b:active{transform:scale(.97)}
+button.b:disabled{opacity:.4}
+button.big{width:100%;padding:16px;font-size:18px;background:var(--brass);color:#1b140a;border:none}
+button.big.stop{background:var(--warn);color:#fff}
+button.sm{padding:6px 10px;font-size:14px}
+.bpm{font-size:64px;font-weight:700;text-align:center;line-height:1;font-variant-numeric:tabular-nums}
+.bpm small{font-size:16px;color:var(--muted);font-weight:500;margin-left:4px}
+.sub{text-align:center;color:var(--muted);font-size:14px;margin-top:4px}
+.dots{display:flex;justify-content:center;gap:10px;margin:16px 0}
+.dot{width:22px;height:22px;border-radius:50%;background:#3a3128;transition:background .05s}
+.dot.acc{border:2px solid var(--brass)}
+.dot.lit{background:var(--brass2)}
+.check{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--text)}
+.check input{width:20px;height:20px;accent-color:var(--brass)}
+.muted{color:var(--muted);font-size:13px}
+.status{font-size:14px;color:var(--ok);min-height:18px;margin-top:8px}
+.time{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted)}
+.timer{font-size:56px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;line-height:1.1}
+.stats{display:flex;gap:10px}
+.stat{flex:1;background:#16120e;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px;color:var(--brass2)}
+.stat span{font-size:12px;color:var(--muted)}
+ul.log{list-style:none;margin:0;padding:0}
+ul.log li{border-top:1px solid var(--line);padding:10px 0;display:flex;gap:10px;align-items:flex-start}
+ul.log li:first-child{border-top:none}
+ul.log .main{flex:1}
+ul.log .main div:first-child{font-weight:600}
+.del{background:none;border:none;color:var(--muted);font-size:18px;padding:2px 6px}
+.ab{display:flex;gap:8px}
+.ab button{flex:1}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;background:#16120e;border:1px solid var(--line);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.file{display:block;width:100%;padding:14px;border:1px dashed var(--brass);border-radius:10px;text-align:center;color:var(--brass2);font-weight:600}
+.file input{display:none}
+.bar{height:10px;background:#16120e;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.bar>div{height:100%;background:var(--brass);width:0;transition:width .25s}
+.note-big{font-size:52px;font-weight:700;text-align:center;line-height:1}
+.note-big small{display:block;font-size:15px;color:var(--muted);font-weight:500;margin-top:6px}
+.quick{display:flex;gap:8px}
+.quick button{flex:1}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{padding:8px 0;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;font-size:15px}
+.steps li:first-child{border-top:none}
+.steps li.now{color:var(--brass2);font-weight:700}
+.steps li.done{color:var(--muted);text-decoration:line-through}
+.steps .m,.tag{white-space:nowrap}
+.steps .m{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px}
+.edit{border-top:1px solid var(--line);padding:10px 0}
+.edit:first-child{border-top:none}
+.edit input[type=text]{flex:1;min-width:150px}
+.edit input[type=number]{width:64px}
+.tag{font-size:12px;padding:2px 7px;border-radius:99px;background:#16120e;border:1px solid var(--line);color:var(--muted)}
+/* start */
+.badge{display:flex;align-items:center;gap:12px}
+.badge .big-ic{font-size:34px}
+.badge b{font-size:18px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 12px;text-align:left;color:var(--text);font-size:16px;font-weight:700;min-height:96px;display:flex;flex-direction:column;gap:6px}
+.tile i{font-style:normal;font-size:26px}
+.tile span{font-size:12px;color:var(--muted);font-weight:500}
+.tile:active{transform:scale(.98)}
+.tile.off{opacity:.45}
+/* notenschrift */
+.staff{width:100%;overflow:hidden;background:#fbf7ef;border-radius:10px;padding:6px 4px}
+.staff svg{display:block;width:100%;height:auto;color:#2a2219}
+.staff .n.hl{color:#c27a00}
+.staff .n.hl text{fill:#c27a00}
+.tip{background:#16120e;border-left:3px solid var(--brass);border-radius:6px;padding:10px 12px;font-size:14px;line-height:1.45}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{padding:8px 12px;border-radius:99px;border:1px solid var(--line);background:#16120e;color:var(--muted);font-size:14px;font-weight:600}
+#tuGauge{display:block;width:100%;max-width:420px;margin:0 auto}
+#tuNeedle{transition:transform .12s linear}
+.tu-dim{opacity:.35}
+.seg button.on{background:var(--brass);color:#1b140a;border-color:var(--brass)}
+</style>
+</head>
+<body>
+<header>
+  <button class="b sm" id="back">← Start</button>
+  <div class="ttl">
+    <h1>🎺 Brassband <span>Oefenmaatje</span></h1>
+    <p id="subTitle">Je oefencoach voor alle koperblazers</p>
+  </div>
+</header>
+<main>
+
+<!-- START -->
+<section id="home" class="on">
+  <div class="card" id="firstRun" style="display:none">
+    <h2>Welkom! Welk instrument speel je?</h2>
+    <p class="muted" style="margin:0 0 10px">Toonladders, grepen, stemtoon en oefeningen worden daarop afgestemd.</p>
+    <div class="row"><select id="frInstr" style="flex:1"></select><button class="b" id="frOk">Kies</button></div>
+  </div>
+  <div class="card">
+    <div class="badge">
+      <div style="flex:1"><div class="muted">Je speelt</div><b id="badgeName">–</b><div class="muted" id="badgeInfo"></div></div>
+      <button class="b sm" data-go="instrument">Wijzig</button>
+    </div>
+  </div>
+  <div class="tiles">
+    <button class="tile" data-go="routine"><i>📋</i>Routine<span>Oefenen met plan en timer</span></button>
+    <button class="tile pitch" data-go="inblazen"><i>🌬️</i>Inblazen<span>Lange tonen en lipslurs</span></button>
+    <button class="tile pitch" data-go="toonladders"><i>🎼</i>Toonladders<span>Met noten en grepen</span></button>
+    <button class="tile pitch" data-go="akkoorden"><i>🎶</i>Akkoorden<span>Zuiver spelen: terts en kwint</span></button>
+    <button class="tile pitch" data-go="tuner"><i>🎯</i>Stemapparaat<span>Met naald, via de microfoon</span></button>
+    <button class="tile pitch" data-go="drone"><i>🎵</i>Stemtoon<span>Stemmen op gehoor</span></button>
+    <button class="tile" data-go="metro"><i>⏱️</i>Metronoom<span>Met tempoladder</span></button>
+    <button class="tile" data-go="loop"><i>🔁</i>Loop<span>Opname vertragen en herhalen</span></button>
+    <button class="tile" data-go="log"><i>📒</i>Logboek<span>Weekdoel en records</span></button>
+    <button class="tile" data-go="instrument"><i>⚙️</i>Instrument<span>Instellingen</span></button>
+  </div>
+</section>
+
+<!-- INSTRUMENT -->
+<section id="instrument">
+  <div class="card">
+    <h2>Mijn instrument</h2>
+    <div class="row"><select id="iSel" style="flex:1"></select></div>
+    <div class="row" id="iClefRow">
+      <label>Notatie</label>
+      <div class="seg" id="iClef">
+        <button data-v="treble">g-sleutel (brassband)</button>
+        <button data-v="bass">f-sleutel (in C)</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Niveau</label>
+      <div class="seg" id="iLevel">
+        <button data-v="1">Basis</button>
+        <button data-v="2">Gevorderd</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Stemming A =</label><input type="number" id="iA4" value="440" min="430" max="450"><label>Hz</label>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Zo is alles nu ingesteld</h2>
+    <div id="iInfo" class="tip"></div>
+  </div>
+</section>
+
+<!-- TOONLADDERS -->
+<section id="toonladders">
+  <div class="card">
+    <div class="row">
+      <select id="sTonic"></select>
+      <select id="sType" style="flex:1">
+        <option value="maj">Majeur</option>
+        <option value="nat">Mineur (natuurlijk)</option>
+        <option value="har">Mineur (harmonisch)</option>
+        <option value="mel">Mineur (melodisch)</option>
+        <option value="chr">Chromatisch</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>Octaven</label><select id="sOct"><option value="1">1</option><option value="2">2</option></select>
+      <label>Start</label><select id="sStart"></select>
+      <label class="check"><input type="checkbox" id="sFing" checked> Grepen</label>
+    </div>
+    <div class="status" id="sMsg" style="color:var(--muted)"></div>
+  </div>
+  <div class="card">
+    <h2 id="sTitle">Toonladder</h2>
+    <div class="staff" id="sStaff"></div>
+  </div>
+  <div class="card" id="sPlayer"></div>
+</section>
+
+<!-- AKKOORDEN -->
+<section id="akkoorden">
+  <div class="card">
+    <div class="row">
+      <select id="cRoot"></select>
+      <select id="cType" style="flex:1">
+        <option value="maj">Majeur-akkoord</option>
+        <option value="min">Mineur-akkoord</option>
+        <option value="dom">Dominant-septiemakkoord</option>
+      </select>
+    </div>
+    <div class="row">
+      <label class="check"><input type="checkbox" id="cFing" checked> Grepen</label>
+    </div>
+  </div>
+  <div class="card">
+    <h2 id="cTitle">Akkoord</h2>
+    <div class="staff" id="cStaff"></div>
+  </div>
+  <div class="card">
+    <h2>Speel mee in het akkoord</h2>
+    <div class="row"><label>Jij speelt de</label><div class="seg" id="cRole"></div></div>
+    <div class="tip" id="cTip" style="margin-top:12px"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="b big" id="cBand">▶ Band speelt mee</button>
+    </div>
+    <p class="muted" style="margin:8px 0 0">De "band" speelt de andere tonen van het akkoord <b>zuiver</b>, plus de grondtoon een octaaf lager. Zoek de plek waar jouw toon er rustig in valt: geen zweving meer.</p>
+  </div>
+  <div class="card">
+    <h2>Hoor het verschil</h2>
+    <p class="muted" style="margin:0 0 10px">Eerst klinkt het akkoord zoals een stemapparaat het wil (getemperd), daarna zoals een goede band het speelt (zuiver). Let op de terts.</p>
+    <div class="row"><button class="b" id="cCompare" style="flex:1">▶ Getemperd → Zuiver</button></div>
+    <div class="status" id="cCmpStatus"></div>
+  </div>
+</section>
+
+<!-- INBLAZEN -->
+<section id="inblazen">
+  <div class="card">
+    <div class="row"><select id="eSel" style="flex:1"></select></div>
+    <div class="row" id="eKeyRow" style="display:none"><label>Toonsoort</label><select id="eKey"></select></div>
+    <p class="muted" id="eDesc" style="margin:10px 0 0"></p>
+    <div class="row"><label class="check"><input type="checkbox" id="eFing" checked> Grepen</label></div>
+  </div>
+  <div class="card">
+    <h2 id="eTitle">Oefening</h2>
+    <div class="staff" id="eStaff"></div>
+    <div class="status" id="eMsg" style="color:var(--muted)"></div>
+  </div>
+  <div class="card" id="ePlayer"></div>
+</section>
+
+<!-- ROUTINE -->
+<section id="routine">
+  <div class="card" id="runCard">
+    <div class="row"><select id="rSel" style="flex:1"></select></div>
+    <div style="margin-top:14px">
+      <div class="sub" id="rStepName">Kies een routine en druk op Start</div>
+      <div class="timer" id="rTimer">00:00</div>
+      <div class="sub" id="rNext">&nbsp;</div>
+    </div>
+    <div class="bar" style="margin-top:12px"><div id="rBar"></div></div>
+    <div class="row" style="margin-top:14px"><button class="b big" id="rStart">▶ Start routine</button></div>
+    <div class="row">
+      <button class="b" id="rPause" style="flex:1" disabled>❚❚ Pauze</button>
+      <button class="b" id="rSkip" style="flex:1" disabled>Volgende ⏭</button>
+    </div>
+    <div class="status" id="rStatus"></div>
+  </div>
+  <div class="card">
+    <h2>Onderdelen</h2>
+    <ul class="steps" id="rList"></ul>
+    <p class="muted" style="margin:10px 0 0">Bij 🎵 start de stemtoon vanzelf, bij ⏱️ de metronoom op het juiste tempo. Bij elk onderdeel met <b>groei</b> gaat het tempo na elke voltooide routine een tikje omhoog.</p>
+  </div>
+  <div class="card">
+    <h2>Routine aanpassen</h2>
+    <div class="row"><label>Naam</label><input type="text" id="rName" style="flex:1"></div>
+    <div id="rEdit" style="margin-top:8px"></div>
+    <div class="row">
+      <button class="b" id="rAdd">+ Onderdeel</button>
+      <button class="b" id="rNew">+ Nieuwe routine</button>
+    </div>
+    <div class="row">
+      <button class="b sm" id="rDel">Verwijder deze routine</button>
+      <button class="b sm" id="rReset">Standaardroutines terugzetten</button>
+    </div>
+    <div class="status" id="rEditStatus"></div>
+  </div>
+</section>
+
+<!-- METRONOOM -->
+<section id="metro">
+  <div class="card">
+    <div class="bpm"><span id="bpmVal">90</span><small>bpm</small></div>
+    <div class="sub" id="tempoName">Andante</div>
+    <div class="dots" id="dots"></div>
+    <div class="row">
+      <button class="b" data-d="-5">−5</button>
+      <button class="b" data-d="-1">−1</button>
+      <input type="range" id="bpm" min="30" max="240" value="90">
+      <button class="b" data-d="1">+1</button>
+      <button class="b" data-d="5">+5</button>
+    </div>
+    <div class="row" style="margin-top:14px"><button class="b big" id="play">▶ Start</button></div>
+    <div class="row"><button class="b" id="tap" style="flex:1">Tik het tempo</button></div>
+  </div>
+  <div class="card">
+    <h2>Instellingen</h2>
+    <div class="row">
+      <label for="beats">Tellen per maat</label>
+      <select id="beats"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
+      <label for="sub">Onderverdeling</label>
+      <select id="sub"><option value="1">geen</option><option value="2">achtsten</option><option value="3">triolen</option><option value="4">zestienden</option></select>
+    </div>
+    <div class="row"><label class="check"><input type="checkbox" id="accent" checked> Accent op tel 1</label></div>
+    <div class="row"><label for="vol">Volume</label><input type="range" id="vol" min="0" max="100" value="70"></div>
+  </div>
+  <div class="card">
+    <h2>Tempoladder</h2>
+    <p class="muted" style="margin:0 0 10px">Begin langzaam en laat de metronoom vanzelf opschuiven. Ideaal voor dat ene loopje-van-de-hel.</p>
+    <div class="row"><label class="check"><input type="checkbox" id="ladderOn"> Aan</label></div>
+    <div class="row">
+      <label>Van</label><input type="number" id="lStart" value="70" min="30" max="240">
+      <label>naar</label><input type="number" id="lEnd" value="110" min="30" max="240">
+    </div>
+    <div class="row">
+      <label>Stap</label><input type="number" id="lStep" value="4" min="1" max="30">
+      <label>elke</label><input type="number" id="lBars" value="4" min="1" max="64"><label>maten</label>
+    </div>
+    <div class="status" id="ladderStatus"></div>
+  </div>
+</section>
+
+<!-- STEMAPPARAAT -->
+<section id="tuner">
+  <div class="card">
+    <svg id="tuGauge" viewBox="0 0 300 175" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="note-big" id="tuBig"><span id="tuNote">–</span><small id="tuInfo">Druk op Start en speel een lange toon</small></div>
+    <div class="sub" id="tuCents" style="font-size:18px;margin-top:6px">&nbsp;</div>
+    <div class="row" style="margin-top:14px"><button class="b big" id="tuStart">🎙️ Start stemapparaat</button></div>
+    <div class="status" id="tuStatus"></div>
+  </div>
+  <div class="card">
+    <h2>Waar mik je op?</h2>
+    <div class="seg" id="tuTarget">
+      <button data-v="0" class="on">Recht (0)</button>
+      <button data-v="-14">Grote terts (−14)</button>
+      <button data-v="16">Kleine terts (+16)</button>
+      <button data-v="2">Kwint (+2)</button>
+    </div>
+    <p class="muted" style="margin:10px 0 0">Speel je in een akkoord de terts of kwint, kies dan dat doel. De naald staat in het midden als je zuiver in het akkoord zit, niet als je "recht" volgens het stemapparaat speelt.</p>
+  </div>
+  <div class="card">
+    <h2>Tips</h2>
+    <p class="muted" style="margin:0">Speel je instrument eerst een paar minuten warm. Een koud instrument staat lager. Stem op een comfortabele middentoon en speel ontspannen, zonder de toon met je lip "recht te buigen". Te hoog? Trek de hoofdstembuis iets uit. Te laag? Schuif hem iets in. Je ziet wat jij genoteerd speelt, en daaronder wat er echt klinkt.</p>
+  </div>
+</section>
+
+<!-- STEMTOON -->
+<section id="drone">
+  <div class="card">
+    <div class="note-big"><span id="dWritten">C</span><small id="dSounds"></small></div>
+    <div class="row" style="margin-top:16px"><button class="b big" id="dPlay">▶ Stemtoon aan</button></div>
+    <div class="quick" style="margin-top:10px" id="dQuick"></div>
+  </div>
+  <div class="card">
+    <h2>Toon kiezen</h2>
+    <div class="row">
+      <label>Jij speelt</label><select id="dNote"></select>
+      <label>Octaaf</label>
+      <select id="dOct"><option value="-1">laag</option><option value="0" selected>midden</option><option value="1">hoog</option></select>
+    </div>
+    <div class="row">
+      <label>Klank</label>
+      <select id="dTone"><option value="sine">Zuiver</option><option value="warm" selected>Warm</option><option value="organ">Orgel</option></select>
+      <label class="check"><input type="checkbox" id="dFifth"> + kwint</label>
+      <label class="check"><input type="checkbox" id="dLow"> + octaaf lager</label>
+    </div>
+    <div class="row"><label>Volume</label><input type="range" id="dVol" min="0" max="100" value="45"></div>
+    <p class="muted" style="margin:10px 0 0" id="dInstrInfo"></p>
+  </div>
+  <div class="card">
+    <h2>Zo gebruik je het</h2>
+    <p class="muted" style="margin:0">Speel een lange toon mee en luister naar <b>zwevingen</b>, dat golvende "wah-wah-wah". Hoe langzamer de zweving, hoe dichter je erbij zit. Is de zweving helemaal weg, dan zit je zuiver. Oefen akkoordtonen in het onderdeel <b>Akkoorden</b>.</p>
+  </div>
+</section>
+
+<!-- LOOP -->
+<section id="loop">
+  <div class="card">
+    <h2>Opname inladen</h2>
+    <label class="file">🎵 Kies een audiobestand (mp3, m4a, wav)<input type="file" id="file" accept="audio/*"></label>
+    <div class="muted" id="fileName" style="margin-top:8px">Bijvoorbeeld een opname van de repetitie of een voorbeeldversie van het stuk.</div>
+  </div>
+  <div class="card">
+    <h2>Afspelen</h2>
+    <div class="row">
+      <span class="time" id="cur">0:00</span>
+      <input type="range" id="seek" min="0" max="1000" value="0" step="1">
+      <span class="time" id="dur">0:00</span>
+    </div>
+    <div class="row" style="margin-top:14px"><button class="b big" id="aPlay" disabled>▶ Afspelen</button></div>
+    <div class="row" style="margin-top:14px">
+      <label for="speed">Snelheid</label>
+      <input type="range" id="speed" min="50" max="100" value="100" step="5">
+      <span class="pill" id="speedVal">100%</span>
+    </div>
+    <p class="muted" style="margin:8px 0 0">De toonhoogte blijft gelijk, alleen het tempo zakt.</p>
+  </div>
+  <div class="card">
+    <h2>A–B herhalen</h2>
+    <div class="ab">
+      <button class="b" id="setA">Zet A</button>
+      <button class="b" id="setB">Zet B</button>
+      <button class="b" id="clrAB">Wis</button>
+    </div>
+    <div class="row">
+      <span class="pill">A: <span id="aVal">–</span></span>
+      <button class="b sm" data-nudge="A" data-n="-0.5">A −½s</button>
+      <button class="b sm" data-nudge="A" data-n="0.5">A +½s</button>
+    </div>
+    <div class="row">
+      <span class="pill">B: <span id="bVal">–</span></span>
+      <button class="b sm" data-nudge="B" data-n="-0.5">B −½s</button>
+      <button class="b sm" data-nudge="B" data-n="0.5">B +½s</button>
+    </div>
+    <div class="row"><label class="check"><input type="checkbox" id="loopOn" checked> Herhalen tussen A en B</label></div>
+    <div class="row"><label class="check"><input type="checkbox" id="speedUp"> Na elke herhaling 5% sneller (tot 100%)</label></div>
+    <div class="status" id="loopStatus"></div>
+  </div>
+</section>
+
+<!-- LOGBOEK -->
+<section id="log">
+  <div class="card">
+    <h2>Deze week</h2>
+    <div class="row" style="justify-content:space-between">
+      <div><b id="wMin" style="font-size:24px;color:var(--brass2)">0</b> <span class="muted">van</span> <input type="number" id="wGoal" value="120" min="10" max="2000" style="width:76px"> <span class="muted">minuten</span></div>
+      <span class="pill" id="wPct">0%</span>
+    </div>
+    <div class="bar" style="margin-top:10px"><div id="wBar"></div></div>
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><b id="sStreak">0</b><span>dagen op rij</span></div>
+      <div class="stat"><b id="sTotal">0</b><span>sessies totaal</span></div>
+      <div class="stat"><b id="sHours">0</b><span>uur totaal</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Losse sessie loggen</h2>
+    <div class="row">
+      <div class="timer" id="timer" style="font-size:40px;flex:1;text-align:left">00:00</div>
+      <button class="b" id="tStart">▶ Timer</button>
+      <button class="b" id="tReset">Reset</button>
+    </div>
+    <div class="row">
+      <input type="text" id="piece" placeholder="Stuk of oefening" list="pieces" style="flex:1">
+      <datalist id="pieces"></datalist>
+    </div>
+    <div class="row">
+      <label>Minuten</label><input type="number" id="mins" value="0" min="0" max="600">
+      <label>Tempo gehaald</label><input type="number" id="bpmDone" value="" min="0" max="300" placeholder="bpm">
+    </div>
+    <div class="row"><textarea id="note" placeholder="Wat ging goed, wat moet beter? (bijv. hoge G in maat 34 nog wiebelig)"></textarea></div>
+    <div class="row"><button class="b big" id="save">Opslaan in logboek</button></div>
+    <div class="status" id="saveStatus"></div>
+  </div>
+  <div class="card">
+    <h2>Tempo-records</h2>
+    <ul class="log" id="records"></ul>
+  </div>
+  <div class="card">
+    <h2>Geschiedenis</h2>
+    <ul class="log" id="logList"></ul>
+    <div class="row"><button class="b" id="copy" style="flex:1">Kopieer logboek als tekst</button></div>
+    <div class="status" id="copyStatus"></div>
+    <p class="muted" style="margin:8px 0 0">Alles wordt bewaard in deze browser, op dit apparaat.</p>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store={
+  get(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+/* =================== INSTRUMENTEN =================== */
+// t = transpositie: klinkend = genoteerd (g-sleutel) + t. lo/hi = bereik in g-sleutelnotatie.
+const INSTR=[
+  {id:'sop',name:'Es-sopraancornet',short:'Es-sopraan',t:3,kind:'valves',lo:54,hi:81,clefs:['treble'],ic:'🎺'},
+  {id:'cor',name:'Cornet in Bes',short:'Cornet',t:-2,kind:'valves',lo:54,hi:82,clefs:['treble'],ic:'🎺'},
+  {id:'bug',name:'Bugel in Bes',short:'Bugel',t:-2,kind:'valves',lo:54,hi:79,clefs:['treble'],ic:'🎺'},
+  {id:'alt',name:'Althoorn in Es',short:'Althoorn',t:-9,kind:'valves',lo:54,hi:79,clefs:['treble'],ic:'📯'},
+  {id:'bar',name:'Bariton in Bes',short:'Bariton',t:-14,kind:'valves',lo:54,hi:79,clefs:['treble','bass'],ic:'📯'},
+  {id:'tbn',name:'Tenortrombone',short:'Trombone',t:-14,kind:'slide',lo:54,hi:79,clefs:['treble','bass'],ic:'🎺'},
+  {id:'btb',name:'Bastrombone',short:'Bastrombone',t:-14,kind:'slide',lo:54,hi:76,clefs:['bass'],ic:'🎺'},
+  {id:'eup',name:'Euphonium in Bes',short:'Euphonium',t:-14,kind:'valves',lo:54,hi:81,clefs:['treble','bass'],ic:'📯'},
+  {id:'ebb',name:'Es-bas',short:'Es-bas',t:-21,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'},
+  {id:'bbb',name:'Bes-bas',short:'Bes-bas',t:-26,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'},
+  {id:'perc',name:'Slagwerk',short:'Slagwerk',t:0,kind:'perc',lo:54,hi:79,clefs:['treble'],ic:'🥁'}
+];
+let cfg=Object.assign({instr:null,clef:'treble',level:1,a4:440},store.get('bo.cfg',{}));
+const I=()=>INSTR.find(x=>x.id===cfg.instr)||INSTR[1];
+const isBass=()=>cfg.clef==='bass'&&I().clefs.includes('bass');
+const shift=()=>isBass()?0:I().t;            // klinkend = display + shift
+const toDisp=tw=>isBass()?tw+I().t:tw;        // g-sleutelnotatie -> eigen notatie
+const toTw=d=>isBass()?d-I().t:d;
+const sounding=d=>d+shift();
+function hz(m){const a=Math.max(400,Math.min(480,+cfg.a4||440));return a*Math.pow(2,(m-69)/12);}
+function saveCfg(){store.set('bo.cfg',cfg);}
+
+/* =================== NOTENNAMEN =================== */
+const NAT={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const LET='CDEFGAB';
+const SP_FLAT=[['C',0],['D',-1],['D',0],['E',-1],['E',0],['F',0],['G',-1],['G',0],['A',-1],['A',0],['B',-1],['B',0]];
+const SP_SHARP=[['C',0],['C',1],['D',0],['D',1],['E',0],['F',0],['F',1],['G',0],['G',1],['A',0],['A',1],['B',0]];
+const SP_DEF=[['C',0],['C',1],['D',0],['E',-1],['E',0],['F',0],['F',1],['G',0],['A',-1],['A',0],['B',-1],['B',0]];
+function nl(L,a){
+  if(a===0)return L;
+  if(a>0)return L+'is'.repeat(a);
+  if(L==='E'||L==='A')return L+'s'+'es'.repeat(-a-1);
+  if(L==='B')return 'Bes'+'es'.repeat(-a-1);
+  return L+'es'.repeat(-a);
+}
+const pc=m=>((m%12)+12)%12;
+function spellDef(m,table){const [L,a]=(table||SP_DEF)[pc(m)];return note(m,L,a);}
+function note(m,L,a){return {m,L,a};}
+function nameOf(m){const [L,a]=SP_DEF[pc(m)];return nl(L,a);}
+
+/* =================== GREPEN =================== */
+const VALVES={54:'123',55:'13',56:'23',57:'12',58:'1',59:'2',60:'0',61:'123',62:'13',63:'23',64:'12',65:'1',66:'2',67:'0',68:'23',69:'12',70:'1',71:'2',72:'0',73:'12',74:'1',75:'2',76:'0',77:'1',78:'2',79:'0',80:'23',81:'12',82:'1',83:'2',84:'0'};
+const SLIDE={40:'7',41:'6',42:'5',43:'4',44:'3',45:'2',46:'1',47:'7',48:'6',49:'5',50:'4',51:'3',52:'2',53:'1',54:'5',55:'4',56:'3',57:'2',58:'1',59:'4',60:'3',61:'2',62:'1',63:'3',64:'2',65:'1',66:'3',67:'2/4',68:'3',69:'2',70:'1',71:'2',72:'1'};
+function fingering(d){
+  const ins=I();
+  if(ins.kind==='valves'){const v=VALVES[toTw(d)];return v==null?'':(v==='0'?'0':v.split('').join('-'));}
+  if(ins.kind==='slide'){const v=SLIDE[sounding(d)];return v==null?'':v;}
+  return '';
+}
+
+/* =================== NOTENBALK (SVG) =================== */
+// voortekening: aantal kwinten (+ = kruisen, − = mollen)
+const FIFTH={F:-1,C:0,G:1,D:2,A:3,E:4,B:5};
+const fifths=(L,a)=>FIFTH[L]+7*a;
+function sigAcc(key,L){
+  if(key>0)return 'FCGDAEB'.indexOf(L)<key?1:0;
+  if(key<0)return 'BEADGCF'.indexOf(L)<-key?-1:0;
+  return 0;
+}
+function enharmUp(L,a){const li=(LET.indexOf(L)+6)%7;const NL=LET[li];let na=pc(NAT[L]+a)-NAT[NL];if(na<-6)na+=12;if(na>6)na-=12;return [NL,na];}
+function sigLabel(k){return k===0?'geen voortekening':k>0?`${k} ${k===1?'kruis':'kruisen'}`:`${-k} ${k===-1?'mol':'mollen'}`;}
+function fillLast(seq,per){const t=seq.reduce((a,x)=>a+x.d,0);if(seq.length&&t%per)seq[seq.length-1].d+=per-t%per;return seq;}
+// kruis, mol en herstellingsteken als getekende vormen (centrum op y)
+function accSvg(type,x,y){
+  const st='stroke="currentColor" fill="none" stroke-linecap="butt"';
+  if(type===1)return `<path d="M${x-2.2} ${y-9} V${y+10} M${x+2.2} ${y-10} V${y+9}" ${st} stroke-width="1.2"/><path d="M${x-5} ${y-1.8} L${x+5} ${y-4.2} M${x-5} ${y+4.2} L${x+5} ${y+1.8}" ${st} stroke-width="2.6"/>`;
+  if(type===-1)return `<path d="M${x-3} ${y-13} V${y+5}" ${st} stroke-width="1.3"/><path d="M${x-3} ${y+5} C ${x+7} ${y-1}, ${x+5} ${y-6}, ${x-3} ${y-1}" ${st} stroke-width="1.8"/>`;
+  if(type===0)return `<path d="M${x-3} ${y-10} V${y+4} M${x+3} ${y-4} V${y+10}" ${st} stroke-width="1.2"/><path d="M${x-3} ${y-1.5} L${x+3} ${y-3.5} M${x-3} ${y+3.5} L${x+3} ${y+1.5}" ${st} stroke-width="2.4"/>`;
+  if(type===2)return `<path d="M${x-4} ${y-4} L${x+4} ${y+4} M${x+4} ${y-4} L${x-4} ${y+4}" ${st} stroke-width="2"/>`;
+  if(type===-2)return accSvg(-1,x-5,y)+accSvg(-1,x+3,y);
+  return '';
+}
+function renderStaff(box,items,opts){
+  opts=opts||{};
+  const clef=isBass()?'bass':'treble';
+  const key=opts.key||0,per=opts.beats||4;
+  const sp=10,W=Math.max(300,box.clientWidth||600),narrow=W<480,noteW=(opts.noteW||34)*(narrow?0.74:1),mPad=narrow?8:12,fSize=narrow?10:12;
+  const sigW=Math.abs(key)*9+(key?8:0),clefW=40+sigW;
+  // maten bepalen
+  const measures=[];let cur=[],beats=0;
+  items.forEach((it,i)=>{cur.push(i);beats+=it.d;if(beats>=per-1e-6){measures.push(cur);cur=[];beats=0;}});
+  if(cur.length)measures.push(cur);
+  // maten over regels verdelen
+  const avail=W-clefW-14,lines=[];let ln=[],used=0;
+  measures.forEach(m=>{const w=m.length*noteW+mPad;if(ln.length&&used+w>avail){lines.push(ln);ln=[];used=0;}ln.push(m);used+=w;});
+  if(ln.length||!lines.length)lines.push(ln);
+  const top=50,staffH=4*sp,below=48,fingH=opts.fing?18:0,labH=items.some(x=>x.label)?16:0;
+  const LH=top+staffH+below+fingH+labH+6;
+  const ref=clef==='treble'?30:18;
+  const off=clef==='treble'?0:-14;
+  let s=`<svg viewBox="0 0 ${W} ${LH*lines.length}" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,system-ui,sans-serif">`;
+  lines.forEach((line,li)=>{
+    const y0=li*LH+top,yb=y0+staffH;
+    const yOf=di=>yb-(di-ref)*sp/2;
+    const isFinal=li===lines.length-1;
+    const nNotes=line.reduce((a,m)=>a+m.length,0),natural=nNotes*noteW+line.length*mPad;
+    let stretch=natural?avail/natural:1;if(isFinal)stretch=Math.min(stretch,1.25);
+    const nW=noteW*stretch,pW=mPad*stretch;
+    const endX=isFinal?Math.min(W-4,clefW+8+natural*stretch-pW/2+2):W-4;
+    for(let k=0;k<5;k++)s+=`<line x1="4" x2="${endX}" y1="${y0+k*sp}" y2="${y0+k*sp}" stroke="currentColor" stroke-width="1"/>`;
+    s+=`<line x1="4" x2="4" y1="${y0}" y2="${yb}" stroke="currentColor"/>`;
+    s+=clef==='treble'?clefG(14,y0,sp):clefF(10,y0,sp);
+    // voortekening
+    const SH=[38,35,39,36,33,37,34],FL=[34,37,33,36,32,35,31];
+    for(let k=0;k<Math.abs(key);k++){
+      const di=(key>0?SH[k]:FL[k])+off;const x=44+k*9;
+      s+=accSvg(key>0?1:-1,x+4,yOf(di));
+    }
+    let x=clefW+8;
+    line.forEach((m,mi)=>{
+      const state={};
+      m.forEach(i=>{
+        const it=items[i];const cx=x+nW/2;
+        s+=`<g class="n" data-i="${i}">`;
+        if(it.rest){
+          if(it.d>=4)s+=`<rect x="${cx-6}" y="${y0+sp}" width="12" height="${sp/2}" fill="currentColor"/>`;
+          else s+=`<rect x="${cx-6}" y="${y0+2*sp-sp/2}" width="12" height="${sp/2}" fill="currentColor"/>`;
+        }else{
+          const oct=(it.m-NAT[it.L]-it.a)/12-1;
+          const di=oct*7+LET.indexOf(it.L);
+          const y=yOf(di);
+          for(let l=ref-2;l>=di;l-=2)s+=`<line x1="${cx-10}" x2="${cx+10}" y1="${yOf(l)}" y2="${yOf(l)}" stroke="currentColor" stroke-width="1.2"/>`;
+          for(let l=ref+10;l<=di;l+=2)s+=`<line x1="${cx-10}" x2="${cx+10}" y1="${yOf(l)}" y2="${yOf(l)}" stroke="currentColor" stroke-width="1.2"/>`;
+          const filled=it.d<2;
+          s+=`<ellipse cx="${cx}" cy="${y}" rx="6.2" ry="4.4" transform="rotate(-20 ${cx} ${y})" fill="${filled?'currentColor':'none'}" stroke="currentColor" stroke-width="${filled?1:1.8}"/>`;
+          if(it.d<4){
+            const up=di<ref+4;
+            s+=up?`<line x1="${cx+5.6}" x2="${cx+5.6}" y1="${y-1}" y2="${y-34}" stroke="currentColor" stroke-width="1.3"/>`
+                 :`<line x1="${cx-5.6}" x2="${cx-5.6}" y1="${y+1}" y2="${y+34}" stroke="currentColor" stroke-width="1.3"/>`;
+          }
+          // toevallig teken alleen als het afwijkt van voortekening / eerder in de maat
+          const sk=it.L+oct;const expect=sk in state?state[sk]:sigAcc(key,it.L);
+          if(it.a!==expect){
+            s+=accSvg(it.a,cx-15,y);
+          }
+          state[sk]=it.a;
+          if(opts.fing){
+            s+=`<text x="${cx}" y="${yb+below+12}" font-size="${fSize}" font-weight="600" text-anchor="middle" fill="currentColor">${fingering(it.m)}</text>`;
+          }
+        }
+        if(it.label)s+=`<text x="${cx}" y="${yb+below+fingH+12}" font-size="10" text-anchor="middle" fill="#8a7a66">${esc(it.label)}</text>`;
+        s+='</g>';
+        x+=nW;
+      });
+      x+=pW;
+      const isLast=isFinal&&mi===line.length-1;
+      const bx=isLast?endX:(mi===line.length-1?W-4:x-pW/2);
+      if(isLast){s+=`<line x1="${bx-4}" x2="${bx-4}" y1="${y0}" y2="${yb}" stroke="currentColor" stroke-width="1"/><line x1="${bx}" x2="${bx}" y1="${y0}" y2="${yb}" stroke="currentColor" stroke-width="3.5"/>`;}
+      else s+=`<line x1="${bx}" x2="${bx}" y1="${y0}" y2="${yb}" stroke="currentColor" stroke-width="1"/>`;
+    });
+  });
+  s+='</svg>';
+  box.innerHTML=s;
+}
+// Eenvoudige getekende sleutels (geen speciaal lettertype nodig)
+function clefG(x,y0,sp){
+  const yG=y0+3*sp; // G-lijn
+  return `<path d="M${x+9} ${y0+5.2*sp} C ${x+2} ${y0+5.6*sp}, ${x+1} ${y0+4.6*sp}, ${x+6} ${y0+4.4*sp}
+  M${x+9} ${y0+5.2*sp} L ${x+11} ${y0-1.4*sp} C ${x+12} ${y0-2.2*sp}, ${x+18} ${y0-1.6*sp}, ${x+15} ${y0-0.2*sp}
+  C ${x+12} ${y0+1.2*sp}, ${x} ${y0+2*sp}, ${x+1} ${yG+0.4*sp}
+  C ${x+2} ${yG+1.6*sp}, ${x+17} ${yG+1.4*sp}, ${x+17} ${yG}
+  C ${x+17} ${yG-1.4*sp}, ${x+6} ${yG-1.4*sp}, ${x+7} ${yG}"
+  fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>`;
+}
+function clefF(x,y0,sp){
+  const yF=y0+sp; // F-lijn (4e lijn van onder)
+  return `<path d="M${x+3} ${yF+0.2*sp} C ${x+2} ${yF-1.4*sp}, ${x+16} ${yF-1.6*sp}, ${x+16} ${yF+0.4*sp}
+  C ${x+16} ${yF+2*sp}, ${x+8} ${yF+3*sp}, ${x+2} ${yF+3.4*sp}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="${x+5}" cy="${yF+0.3*sp}" r="2.6" fill="currentColor"/>
+  <circle cx="${x+22}" cy="${yF-0.5*sp}" r="1.7" fill="currentColor"/><circle cx="${x+22}" cy="${yF+0.5*sp}" r="1.7" fill="currentColor"/>`;
+}
+function highlight(box,i){box.querySelectorAll('.n').forEach(g=>g.classList.toggle('hl',+g.dataset.i===i));}
+
+/* =================== AUDIO =================== */
+let ctx=null,master=null,droneBus=null,synthBus=null;
+function audio(){
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain();master.connect(ctx.destination);master.gain.value=$('vol').value/100;
+    droneBus=ctx.createGain();droneBus.connect(ctx.destination);droneBus.gain.value=$('dVol').value/100;
+  }
+  if(ctx.state==='suspended')ctx.resume();
+  return ctx;
+}
+function click(time,kind,dest){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=kind===0?1760:kind===1?1050:700;
+  const peak=kind===2?0.25:kind===0?0.9:0.6;
+  g.gain.setValueAtTime(0.0001,time);
+  g.gain.exponentialRampToValueAtTime(peak,time+0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+0.05);
+  o.connect(g);g.connect(dest||master);o.start(time);o.stop(time+0.06);
+}
+function brass(freq,time,dur,dest,level){
+  const o=ctx.createOscillator(),g=ctx.createGain(),fl=ctx.createBiquadFilter();
+  const d=Math.max(0.06,dur*0.92);
+  o.type='sawtooth';o.frequency.value=freq;
+  fl.type='lowpass';fl.Q.value=0.8;
+  fl.frequency.setValueAtTime(Math.min(8000,freq*1.5),time);fl.frequency.linearRampToValueAtTime(Math.min(10000,freq*4),time+0.08);
+  const L=level||0.28;
+  g.gain.setValueAtTime(0.0001,time);
+  g.gain.exponentialRampToValueAtTime(L,time+0.03);
+  g.gain.setTargetAtTime(L*0.75,time+0.03,0.15);
+  g.gain.setTargetAtTime(0.0001,time+d,0.03);
+  o.connect(fl);fl.connect(g);g.connect(dest);o.start(time);o.stop(time+d+0.3);
+}
+function chime(){
+  audio();const t=ctx.currentTime+0.02;
+  [[880,0],[1318.5,0.16]].forEach(([f,dt])=>{
+    const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t+dt);g.gain.exponentialRampToValueAtTime(0.4,t+dt+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+dt+0.6);
+    o.connect(g);g.connect(ctx.destination);o.start(t+dt);o.stop(t+dt+0.65);
+  });
+}
+let wakeLock=null,wakeUsers=0;
+async function keepAwake(on){
+  wakeUsers=Math.max(0,wakeUsers+(on?1:-1));
+  try{
+    if(wakeUsers>0&&!wakeLock&&navigator.wakeLock){wakeLock=await navigator.wakeLock.request('screen');}
+    else if(wakeUsers===0&&wakeLock){await wakeLock.release();wakeLock=null;}
+  }catch(e){}
+}
+function stopEverything(){stopMetro();stopDrone();stopSeq();stopChord();stopTuner();if(!au.paused)au.pause();}
+
+/* =================== NAVIGATIE =================== */
+const TITLES={home:'Je oefencoach voor alle koperblazers',instrument:'Instrument',toonladders:'Toonladders',akkoorden:'Akkoorden',inblazen:'Inblazen',routine:'Routine',metro:'Metronoom',drone:'Stemtoon',loop:'Loop',log:'Logboek',tuner:'Stemapparaat'};
+function go(id){
+  if(!TITLES[id])id='home';
+  stopSeq();stopChord();if(id!=='tuner')stopTuner();
+  document.querySelectorAll('main>section').forEach(s=>s.classList.toggle('on',s.id===id));
+  $('back').style.display=id==='home'?'none':'inline-block';
+  $('subTitle').textContent=TITLES[id];
+  window.scrollTo(0,0);
+  if(id==='toonladders')renderScale();
+  if(id==='akkoorden')renderChord();
+  if(id==='inblazen')renderExercise();
+  try{if(location.hash.slice(1)!==id)history.replaceState(null,'','#'+id);}catch(e){}
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{
+  if(b.classList.contains('off')){return;}
+  go(b.dataset.go);
+}));
+$('back').addEventListener('click',()=>go('home'));
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+
+/* =================== INSTRUMENT-INSTELLINGEN =================== */
+function fillInstrSelect(sel){sel.innerHTML=INSTR.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');}
+fillInstrSelect($('iSel'));fillInstrSelect($('frInstr'));$('frInstr').value='cor';
+function intervalName(t){
+  const map={3:'een kleine terts hoger','-2':'een grote secunde lager','-9':'een grote sext lager','-14':'een octaaf + grote secunde lager','-21':'een octaaf + grote sext lager','-26':'twee octaven + grote secunde lager',0:'zoals genoteerd'};
+  return map[t]||'';
+}
+function applyInstrument(){
+  const ins=I();
+  if(!ins.clefs.includes(cfg.clef))cfg.clef=ins.clefs[0];
+  saveCfg();
+  $('iSel').value=ins.id;
+  $('iClefRow').style.display=ins.clefs.length>1?'':'none';
+  document.querySelectorAll('#iClef button').forEach(b=>b.classList.toggle('on',b.dataset.v===cfg.clef));
+  document.querySelectorAll('#iLevel button').forEach(b=>b.classList.toggle('on',+b.dataset.v===+cfg.level));
+  $('iA4').value=cfg.a4;
+  const perc=ins.kind==='perc';
+  const clefTxt=isBass()?'f-sleutel, in C (je leest wat klinkt)':'g-sleutel';
+  $('badgeName').textContent=ins.name;
+  $('badgeInfo').textContent=perc?'Metronoom, routines en logboek':`${clefTxt} · ${cfg.level==2?'gevorderd':'basis'}`;
+  document.querySelectorAll('.tile.pitch').forEach(t=>t.classList.toggle('off',perc));
+  let info;
+  if(perc){info='Voor slagwerk zijn toonladders, akkoorden en de stemtoon niet van toepassing. Metronoom, tempoladder, routines, loop en logboek werken wel. Ritme-oefeningen staan op het verlanglijstje.';}
+  else{
+    const ex=toDisp(60);
+    info=`<b>${ins.name}</b><br>Notatie: ${clefTxt}.<br>`+
+      (isBass()?`Je leest in C: een genoteerde ${nameOf(ex)} klinkt ook als ${nameOf(ex)}.`:`Een genoteerde C klinkt als <b>${nameOf(60+ins.t)}</b> (${intervalName(ins.t)}).`)+
+      `<br>Grepen: ${ins.kind==='slide'?'trekstanden 1–7':'ventielen 1-2-3 (0 = open)'}.`+
+      `<br>Toonladders: ${cfg.level==2?'twee octaven waar het bereik dat toelaat':'één octaaf'}.`+
+      `<br>Stemtoon: A = ${cfg.a4} Hz.`;
+  }
+  $('iInfo').innerHTML=info;
+  $('sOct').value=cfg.level==2?'2':'1';
+  initDroneUI();
+}
+$('iSel').addEventListener('change',e=>{cfg.instr=e.target.value;cfg.clef=I().clefs[0];stopEverything();applyInstrument();});
+document.querySelectorAll('#iClef button').forEach(b=>b.addEventListener('click',()=>{cfg.clef=b.dataset.v;stopEverything();applyInstrument();}));
+document.querySelectorAll('#iLevel button').forEach(b=>b.addEventListener('click',()=>{cfg.level=+b.dataset.v;applyInstrument();}));
+$('iA4').addEventListener('change',e=>{cfg.a4=Math.max(430,Math.min(450,+e.target.value||440));applyInstrument();});
+$('frOk').addEventListener('click',()=>{cfg.instr=$('frInstr').value;cfg.clef=I().clefs[0];$('firstRun').style.display='none';applyInstrument();});
+
+/* =================== SPEEL-ENGINE (notenreeks) =================== */
+const P={playing:false,bus:null,raf:null,times:[],box:null,end:0,onEnd:null};
+function playSeq(seq,o){
+  stopEverything();audio();
+  P.bus=ctx.createGain();P.bus.connect(master);
+  const beat=60/o.bpm;let t=ctx.currentTime+0.12;
+  if(o.countIn){for(let i=0;i<4;i++)click(t+i*beat,i===0?0:1,P.bus);t+=4*beat;}
+  const start=t;P.times=[];let b=0;
+  seq.forEach(it=>{
+    const when=start+b*beat;P.times.push(when);
+    if(!it.rest&&o.tone)brass(hz(sounding(it.m)),when,it.d*beat,P.bus);
+    b+=it.d;
+  });
+  if(o.click)for(let i=0;i<Math.ceil(b);i++)click(start+i*beat,1,P.bus);
+  P.end=start+b*beat;P.box=o.box;P.onEnd=o.onEnd;P.playing=true;
+  keepAwake(true);
+  const loop=()=>{
+    if(!P.playing)return;
+    const now=ctx.currentTime;let cur=-1;
+    for(let i=0;i<P.times.length;i++)if(P.times[i]<=now)cur=i;
+    highlight(P.box,cur);
+    if(now>=P.end+0.1){const cb=P.onEnd;stopSeq();if(cb)cb();return;}
+    P.raf=requestAnimationFrame(loop);
+  };
+  P.raf=requestAnimationFrame(loop);
+}
+function stopSeq(){
+  if(!P.playing)return;
+  P.playing=false;cancelAnimationFrame(P.raf);
+  if(P.bus){const b=P.bus;P.bus=null;try{b.gain.setTargetAtTime(0.0001,ctx.currentTime,0.02);setTimeout(()=>{try{b.disconnect()}catch(e){}},120);}catch(e){}}
+  if(P.box)highlight(P.box,-1);
+  keepAwake(false);
+  document.querySelectorAll('[data-seqplay]').forEach(b=>{b.textContent='▶ Speel';b.classList.remove('stop');});
+}
+// herbruikbare spelerkaart
+function buildPlayer(card,key,getSeq,getBox,getTitle,defBpm){
+  const st=store.get('bo.player.'+key,{bpm:defBpm,mode:'both',grow:0,rep:false});
+  card.innerHTML=`<h2>Oefenen</h2>
+  <div class="row"><label>Tempo</label><input type="number" min="30" max="240" data-k="bpm" value="${st.bpm}"><label>bpm</label>
+  <button class="b sm" data-k="minus">−4</button><button class="b sm" data-k="plus">+4</button></div>
+  <div class="row"><div class="seg" data-k="mode">
+    <button data-v="both">Toon + tik</button><button data-v="tone">Alleen toon</button><button data-v="click">Alleen tik (jij speelt)</button>
+  </div></div>
+  <div class="row"><label class="check"><input type="checkbox" data-k="rep" ${st.rep?'checked':''}> Herhalen</label>
+  <label>elke keer +</label><input type="number" min="0" max="10" data-k="grow" value="${st.grow}" style="width:60px"><label>bpm</label></div>
+  <div class="row" style="margin-top:12px"><button class="b big" data-seqplay="${key}">▶ Speel</button></div>
+  <div class="row"><button class="b" data-k="done" style="flex:1">✅ Gehaald op dit tempo</button></div>
+  <div class="status" data-k="msg"></div>`;
+  const q=k=>card.querySelector(`[data-k="${k}"]`);
+  const save=()=>store.set('bo.player.'+key,st);
+  const segs=q('mode').querySelectorAll('button');
+  const updSeg=()=>segs.forEach(b=>b.classList.toggle('on',b.dataset.v===st.mode));updSeg();
+  segs.forEach(b=>b.addEventListener('click',()=>{st.mode=b.dataset.v;updSeg();save();}));
+  const setB=v=>{st.bpm=Math.max(30,Math.min(240,Math.round(v)));q('bpm').value=st.bpm;save();};
+  q('bpm').addEventListener('change',e=>setB(+e.target.value||defBpm));
+  q('minus').addEventListener('click',()=>setB(st.bpm-4));
+  q('plus').addEventListener('click',()=>setB(st.bpm+4));
+  q('rep').addEventListener('change',e=>{st.rep=e.target.checked;save();});
+  q('grow').addEventListener('change',e=>{st.grow=Math.max(0,Math.min(10,+e.target.value||0));save();});
+  const btn=card.querySelector('[data-seqplay]');
+  const start=()=>{
+    const seq=getSeq();if(!seq||!seq.length){q('msg').textContent='Niets te spelen binnen jouw bereik.';return;}
+    playSeq(seq,{bpm:st.bpm,tone:st.mode!=='click',click:st.mode!=='tone',countIn:true,box:getBox(),onEnd:()=>{
+      if(st.rep){if(st.grow)setB(st.bpm+st.grow);q('msg').textContent=`Nog een keer, nu op ${st.bpm} bpm`;start();}
+    }});
+    btn.textContent='■ Stop';btn.classList.add('stop');q('msg').textContent='';
+  };
+  btn.addEventListener('click',()=>{if(P.playing)stopSeq();else start();});
+  q('done').addEventListener('click',()=>{
+    addLog({t:Date.now(),piece:getTitle(),min:0,bpm:st.bpm,note:''});
+    q('msg').textContent=`Genoteerd: ${getTitle()} op ${st.bpm} bpm. 💪`;
+  });
+}
+
+/* =================== TOONLADDERS =================== */
+const TONICS=[['C',0],['G',0],['D',0],['A',0],['E',0],['B',0],['F',1],['C',1],['F',0],['B',-1],['E',-1],['A',-1],['D',-1],['G',-1]];
+$('sTonic').innerHTML=TONICS.map((t,i)=>`<option value="${i}">${nl(t[0],t[1])}</option>`).join('');
+const sState=store.get('bo.scale',{tonic:9,type:'maj',start:null});
+$('sTonic').value=sState.tonic;$('sType').value=sState.type;
+const STEPS={maj:[2,2,1,2,2,2,1],nat:[2,1,2,2,1,2,2],har:[2,1,2,2,1,3,1],mel:[2,1,2,2,2,2,1]};
+const TYPENAME={maj:'majeur',nat:'mineur (natuurlijk)',har:'mineur (harmonisch)',mel:'mineur (melodisch)',chr:'chromatisch'};
+function dispRange(){const ins=I();let lo=toDisp(ins.lo),hi=toDisp(ins.hi);return [lo,hi];}
+function diatonic(L,a,startM,intervals){
+  const out=[note(startM,L,a)];let m=startM,li=LET.indexOf(L);
+  intervals.forEach(iv=>{
+    m+=iv;li++;const LL=LET[li%7];const oct=Math.floor(li/7);
+    const base=(Math.floor((startM-NAT[L]-a)/12)+oct)*12+NAT[LL];
+    out.push(note(m,LL,m-base));
+  });
+  return out;
+}
+function scaleKey(){
+  let [L,a]=TONICS[+$('sTonic').value];const type=$('sType').value;
+  if(type==='chr')return {L,a,key:0};
+  let k=fifths(L,a)-(type==='maj'?0:3);
+  if(type!=='maj'&&k<=-7){[L,a]=enharmUp(L,a);k=fifths(L,a)-3;}
+  return {L,a,key:k};
+}
+function scaleSeq(){
+  const {L,a,key}=scaleKey();const type=$('sType').value;
+  const [lo,hi]=dispRange();const tpc=pc(NAT[L]+a);
+  let octs=+$('sOct').value;
+  const cands=o=>{const r=[];for(let m=lo;m+12*o<=hi;m++)if(pc(m)===tpc)r.push(m);return r;};
+  let c=cands(octs);let msg='';
+  if(!c.length&&octs===2){octs=1;c=cands(1);msg='Twee octaven past niet in het bereik, dus één octaaf.';}
+  if(!c.length)return {seq:[],msg:'Deze toonladder past niet in het bereik van je instrument.'};
+  const startSel=$('sStart');
+  const prev=+startSel.value;
+  startSel.innerHTML=c.map((m,i)=>`<option value="${m}">${c.length===1?'':(i===0?'laag ':i===c.length-1?'hoog ':'midden ')}(${nl(L,a)}${Math.floor(m/12)-1})</option>`).join('');
+  const pick=c.includes(prev)?prev:(c.includes(sState.start)?sState.start:c[0]);
+  startSel.value=pick;
+  let up,down;
+  if(type==='chr'){
+    up=[note(pick,L,a)];for(let i=1;i<=12*octs;i++){const n=spellDef(pick+i,SP_SHARP);up.push(n);}
+    up[up.length-1]=note(pick+12*octs,L,a);
+    down=[];for(let i=12*octs-1;i>=0;i--)down.push(i===0?note(pick,L,a):spellDef(pick+i,SP_FLAT));
+  }else{
+    let iv=[];for(let o=0;o<octs;o++)iv=iv.concat(STEPS[type]);
+    up=diatonic(L,a,pick,iv);
+    if(type==='mel'){let ivn=[];for(let o=0;o<octs;o++)ivn=ivn.concat(STEPS.nat);down=diatonic(L,a,pick,ivn).reverse().slice(1);}
+    else down=up.slice(0,-1).reverse();
+  }
+  const seq=up.concat(down).map(n=>Object.assign({d:1},n));
+  seq[seq.length-1].d=2;fillLast(seq,4);
+  return {seq,msg,key};
+}
+let curScale=[];
+function scaleTitle(){const {L,a}=scaleKey();return `${nl(L,a)} ${TYPENAME[$('sType').value]}`;}
+function updTonicLabels(){
+  const minor=['nat','har','mel'].includes($('sType').value);const o=$('sTonic').options;
+  o[11].textContent=minor?'Gis':'As';
+  [12,13].forEach(i=>{o[i].hidden=minor;o[i].disabled=minor;});
+  if(minor&&$('sTonic').value==='12')$('sTonic').value='7';
+  if(minor&&$('sTonic').value==='13')$('sTonic').value='6';
+}
+function renderScale(){
+  stopSeq();
+  if(I().kind==='perc')return;
+  updTonicLabels();
+  const {seq,msg,key}=scaleSeq();curScale=seq;
+  $('sTitle').textContent=`${scaleTitle()}`+($('sType').value==='chr'?'':' · '+sigLabel(key||0))+(isBass()?' · f-sleutel':'');
+  $('sMsg').textContent=msg;
+  sState.tonic=+$('sTonic').value;sState.type=$('sType').value;sState.start=+$('sStart').value;store.set('bo.scale',sState);
+  renderStaff($('sStaff'),seq,{fing:$('sFing').checked,key:key||0});
+}
+['sTonic','sType','sOct','sStart','sFing'].forEach(id=>$(id).addEventListener('change',renderScale));
+buildPlayer($('sPlayer'),'scale',()=>curScale,()=>$('sStaff'),()=>'Toonladder '+scaleTitle(),80);
+
+/* =================== AKKOORDEN =================== */
+const ROOTS=SP_FLAT.map(x=>x.slice());ROOTS[6]=['F',1];
+$('cRoot').innerHTML=ROOTS.map((r,i)=>`<option value="${i}">${nl(r[0],r[1])}</option>`).join('');
+const cState=store.get('bo.chord',{root:10,type:'maj',role:1});
+$('cRoot').value=cState.root;$('cType').value=cState.type;
+const CHORD={maj:[0,4,7],min:[0,3,7],dom:[0,4,7,10]};
+const ROLE=['grondtoon','terts','kwint','septiem'];
+const RATIO={0:1,3:6/5,4:5/4,7:3/2,10:7/4};
+const CENTS={0:0,3:15.6,4:-13.7,7:2,10:-31.2};
+function chordRoot(){
+  let [L,a]=ROOTS[+$('cRoot').value];const t=$('cType').value;
+  let k=fifths(L,a)-(t==='min'?3:t==='dom'?1:0);
+  if(t==='min'&&k<=-7){[L,a]=enharmUp(L,a);k=fifths(L,a)-3;}
+  return {L,a,key:k};
+}
+function chordNotes(){
+  const {L,a}=chordRoot();const ivs=CHORD[$('cType').value];
+  const [lo,hi]=dispRange();const center=toDisp(62);
+  let best=null;for(let m=lo;m<=hi-12;m++)if(pc(m)===pc(NAT[L]+a)&&(best==null||Math.abs(m-center)<Math.abs(best-center)))best=m;
+  if(best==null)best=lo;
+  const base=Math.floor((best-NAT[L]-a)/12);
+  const notes=ivs.map((iv,k)=>{
+    const li=LET.indexOf(L)+2*k;const LL=LET[li%7];const m=best+iv;
+    const nat=(base+Math.floor(li/7))*12+NAT[LL];
+    return Object.assign(note(m,LL,m-nat),{d:2,label:ROLE[k],iv});
+  });
+  notes.push(Object.assign(note(best+12,L,a),{d:2,label:'octaaf',iv:12}));
+  return fillLast(notes,4);
+}
+let curChord=[];
+function renderChord(){
+  if(I().kind==='perc')return;
+  curChord=chordNotes();
+  const {L,a,key}=chordRoot();
+  $('cTitle').textContent=`${nl(L,a)} ${$('cType').selectedOptions[0].textContent.toLowerCase()}`;
+  renderStaff($('cStaff'),curChord,{fing:$('cFing').checked,noteW:52,key});
+  const n=CHORD[$('cType').value].length;
+  if(cState.role>=n)cState.role=1;
+  $('cRole').innerHTML=ROLE.slice(0,n).map((r,i)=>`<button data-v="${i}" class="${i===cState.role?'on':''}">${r}</button>`).join('');
+  $('cRole').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{cState.role=+b.dataset.v;saveC();renderChord();if(C.on)startChord();}));
+  const nt=curChord[cState.role];const c=CENTS[nt.iv];
+  const tips={
+    0:`Jij speelt de <b>grondtoon</b> (${nl(nt.L,nt.a)}). Jij bent het fundament: speel hem precies, zoals je stemapparaat aangeeft.`,
+    4:`Jij speelt de <b>grote terts</b> (${nl(nt.L,nt.a)}). Speel hem ongeveer <b>14 cent lager</b> dan het stemapparaat aangeeft. Dan smelt hij in het akkoord. Te hoog klinkt scherp en "zuur".`,
+    3:`Jij speelt de <b>kleine terts</b> (${nl(nt.L,nt.a)}). Speel hem ongeveer <b>16 cent hoger</b> dan het stemapparaat aangeeft.`,
+    7:`Jij speelt de <b>kwint</b> (${nl(nt.L,nt.a)}). Die mag een heel klein beetje <b>hoger</b> (2 cent): bijna recht, maar je hoort een zweving meteen.`,
+    10:`Jij speelt de <b>septiem</b> (${nl(nt.L,nt.a)}). Zuiver ligt die maar liefst <b>31 cent lager</b>. In de praktijk spelen bands hem vaak iets minder laag, maar wel duidelijk omlaag.`
+  };
+  $('cTip').innerHTML=tips[nt.iv]+(fingering(nt.m)?` <span class="muted">Greep: ${fingering(nt.m)}.</span>`:'');
+  saveC();
+}
+function saveC(){cState.root=+$('cRoot').value;cState.type=$('cType').value;store.set('bo.chord',cState);}
+['cRoot','cType','cFing'].forEach(id=>$(id).addEventListener('change',()=>{renderChord();if(C.on)startChord();}));
+const C={on:false,nodes:[]};
+function voiceSus(f,level){
+  const t=ctx.currentTime,g=ctx.createGain();
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(level,t+0.3);
+  const o=ctx.createOscillator();o.type='triangle';o.frequency.value=f;
+  const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(6000,f*4);
+  o.connect(fl);fl.connect(g);g.connect(droneBus);o.start();
+  return {g,oscs:[o]};
+}
+function killNodes(arr){if(!ctx)return;const t=ctx.currentTime;arr.forEach(v=>{v.g.gain.cancelScheduledValues(t);v.g.gain.setTargetAtTime(0.0001,t,0.08);v.oscs.forEach(o=>{try{o.stop(t+0.5)}catch(e){}});});}
+function startChord(){
+  const wasOn=C.on;stopMetro();stopDrone();stopSeq();if(!au.paused)au.pause();
+  audio();killNodes(C.nodes);C.nodes=[];
+  const root=curChord[0];const f0=hz(sounding(root.m));
+  C.nodes.push(voiceSus(f0/2,0.3));
+  curChord.slice(0,-1).forEach((n,i)=>{if(i!==cState.role)C.nodes.push(voiceSus(f0*RATIO[n.iv],0.2));});
+  if(!wasOn){C.on=true;keepAwake(true);}
+  $('cBand').textContent='■ Stop';$('cBand').classList.add('stop');
+}
+function stopChord(){
+  killNodes(C.nodes);C.nodes=[];
+  if(C.on){C.on=false;keepAwake(false);}
+  $('cBand').textContent='▶ Band speelt mee';$('cBand').classList.remove('stop');
+}
+$('cBand').addEventListener('click',()=>C.on?stopChord():startChord());
+$('cCompare').addEventListener('click',()=>{
+  stopEverything();audio();
+  const root=curChord[0];const f0=hz(sounding(root.m));const t=ctx.currentTime+0.1;
+  const play=(start,just)=>{
+    const g=ctx.createGain();g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(0.2,start+0.2);g.gain.setTargetAtTime(0.0001,start+2.4,0.1);g.connect(droneBus);
+    [f0/2].concat(curChord.slice(0,-1).map(n=>just?f0*RATIO[n.iv]:f0*Math.pow(2,n.iv/12))).forEach(f=>{
+      const o=ctx.createOscillator();o.type='triangle';o.frequency.value=f;o.connect(g);o.start(start);o.stop(start+3);
+    });
+  };
+  play(t,false);play(t+3.2,true);
+  $('cCmpStatus').textContent='Nu: getemperd (zoals het stemapparaat)…';
+  setTimeout(()=>{$('cCmpStatus').textContent='Nu: zuiver (zoals een goede band)…';},3200);
+  setTimeout(()=>{$('cCmpStatus').textContent='Hoorde je de rust in het tweede akkoord? Dat is waar je naartoe werkt.';},6400);
+});
+
+/* =================== INBLAZEN =================== */
+const COMBOS=[0,1,2,3,4,5,6];
+function slurBlock(parts,durs){
+  const out=[];
+  COMBOS.forEach(s=>{
+    const ns=parts.map(p=>p-s);
+    if(ns.every(m=>m>=I().lo&&m<=I().hi))ns.forEach((m,i)=>out.push({tw:m,d:durs[i]}));
+  });
+  return out;
+}
+const EX=[
+  {id:'long',name:'Lange tonen',bpm:60,desc:'Hele noten met een hele rust ertussen. Speel elke toon recht, rond en met een rustig crescendo en diminuendo. Adem in tijdens de rust.',
+   gen:()=>{const o=[];[67,66,65,64,63,62,61,60].forEach(m=>{o.push({tw:m,d:4});o.push({rest:true,d:4});});return o;}},
+  {id:'soft',name:'Zachte aanzet',bpm:72,desc:'Korte, zachte noten op dezelfde toon. Zet de toon aan met "doe" in plaats van "toe", zonder harde tong. Daarna een halve tel lager.',
+   gen:()=>{const o=[];[67,65,64,62,60].forEach(m=>{o.push({tw:m,d:1},{tw:m,d:1},{tw:m,d:2},{rest:true,d:4});});return o;}},
+  {id:'slur1',name:'Lipslurs 1: twee tonen',bpm:72,desc:'Binden zonder tong: alleen je lippen en lucht doen het werk. Per greep, steeds een halve toon lager.',
+   gen:()=>slurBlock([60,67,60],[2,2,4])},
+  {id:'slur2',name:'Lipslurs 2: drie tonen',bpm:80,desc:'Drie boventonen per greep. Houd de lucht snel en de lippen soepel. Niet knijpen bij de hoge noot.',
+   gen:()=>slurBlock([60,67,72,67,60],[1,1,1,1,4])},
+  {id:'slur3',name:'Lipslurs 3: hoog',bpm:84,desc:'Voor gevorderden: tot de zesde boventoon. Stop als je lip moe wordt: rust is ook oefenen.',
+   gen:()=>slurBlock([67,72,76,79,76,72,67],[1,1,1,1,1,1,2])},
+  {id:'five',name:'Vingervlugheid: vijf tonen',bpm:96,key:true,desc:'Tonen 1 t/m 5 van de toonladder op en neer. Begin langzaam en verhoog het tempo pas als het écht gelijk loopt.',
+   gen:null}
+];
+$('eSel').innerHTML=EX.map((e,i)=>`<option value="${i}">${e.name}</option>`).join('');
+$('eKey').innerHTML=TONICS.map((t,i)=>`<option value="${i}">${nl(t[0],t[1])} majeur</option>`).join('');
+const eState=store.get('bo.ex',{i:0,key:9});
+$('eSel').value=eState.i;$('eKey').value=eState.key;
+let curEx=[];
+let curExKey=0;
+function exSeq(){
+  const ex=EX[+$('eSel').value];curExKey=0;
+  if(ex.id==='five'){
+    const [L,a]=TONICS[+$('eKey').value];const [lo,hi]=dispRange();const tpc=pc(NAT[L]+a);
+    let best=null;const center=toDisp(62);
+    for(let m=lo;m+7<=hi;m++)if(pc(m)===tpc&&(best==null||Math.abs(m-center)<Math.abs(best-center)))best=m;
+    if(best==null)return [];
+    const up=diatonic(L,a,best,[2,2,1,2]);
+    curExKey=fifths(L,a);
+    const pat=up.concat(up.slice(1,-1).reverse());
+    const seq=pat.concat(pat).map(n=>Object.assign({d:1},n));
+    seq.push(Object.assign({d:4},up[0]));
+    return seq;
+  }
+  return ex.gen().map(it=>it.rest?it:Object.assign({d:it.d},spellDef(toDisp(it.tw))));
+}
+function renderExercise(){
+  stopSeq();
+  if(I().kind==='perc')return;
+  const ex=EX[+$('eSel').value];
+  $('eKeyRow').style.display=ex.key?'':'none';
+  $('eDesc').textContent=ex.desc;
+  $('eTitle').textContent=ex.name;
+  curEx=exSeq();
+  $('eMsg').textContent=curEx.length?'':'Deze oefening valt buiten het bereik van je instrument. Kies een andere.';
+  renderStaff($('eStaff'),curEx,{fing:$('eFing').checked,key:curExKey});
+  eState.i=+$('eSel').value;eState.key=+$('eKey').value;store.set('bo.ex',eState);
+}
+['eSel','eKey','eFing'].forEach(id=>$(id).addEventListener('change',()=>{
+  if(id==='eSel'){const ex=EX[+$('eSel').value];const st=store.get('bo.player.ex.'+ex.id,null);rebuildExPlayer();}
+  renderExercise();
+}));
+function rebuildExPlayer(){const ex=EX[+$('eSel').value];buildPlayer($('ePlayer'),'ex.'+ex.id,()=>curEx,()=>$('eStaff'),()=>ex.key?`${ex.name} (${$('eKey').selectedOptions[0].textContent})`:ex.name,ex.bpm);}
+rebuildExPlayer();
+
+/* =================== METRONOOM =================== */
+const M={bpm:90,beats:4,sub:1,accent:true,playing:false,nextTime:0,tick:0,timer:null,queue:[],ladderBars:0,ladder:false};
+const saved=store.get('cornet.metro',null);
+if(saved){Object.assign(M,{bpm:saved.bpm||90,beats:saved.beats||4,sub:saved.sub||1,accent:saved.accent!==false});}
+$('bpm').value=M.bpm;$('beats').value=M.beats;$('sub').value=M.sub;$('accent').checked=M.accent;
+function saveMetro(){store.set('cornet.metro',{bpm:M.bpm,beats:M.beats,sub:M.sub,accent:M.accent})}
+function tempoName(b){
+  if(b<60)return'Largo';if(b<66)return'Larghetto';if(b<76)return'Adagio';if(b<108)return'Andante';
+  if(b<120)return'Moderato';if(b<156)return'Allegro';if(b<176)return'Vivace';if(b<200)return'Presto';return'Prestissimo (succes!)';
+}
+function setBpm(v){
+  M.bpm=Math.max(30,Math.min(240,Math.round(v)));
+  $('bpm').value=M.bpm;$('bpmVal').textContent=M.bpm;$('tempoName').textContent=tempoName(M.bpm);
+  saveMetro();
+}
+function buildDots(){
+  const d=$('dots');d.innerHTML='';
+  for(let i=0;i<M.beats;i++){const s=document.createElement('div');s.className='dot'+(i===0&&M.accent?' acc':'');d.appendChild(s);}
+}
+function scheduler(){
+  while(M.nextTime<ctx.currentTime+0.12){
+    const isBeat=M.tick%M.sub===0;
+    const beatIdx=Math.floor(M.tick/M.sub);
+    click(M.nextTime,isBeat?((beatIdx===0&&M.accent)?0:1):2);
+    if(isBeat)M.queue.push({beat:beatIdx,time:M.nextTime});
+    M.nextTime+=60/M.bpm/M.sub;
+    M.tick++;
+    if(M.tick>=M.beats*M.sub){M.tick=0;barDone();}
+  }
+}
+function barDone(){
+  if(!M.ladder)return;
+  M.ladderBars++;
+  const every=Math.max(1,+$('lBars').value||4);
+  const end=+$('lEnd').value||M.bpm,step=Math.max(1,+$('lStep').value||1);
+  if(M.ladderBars>=every){M.ladderBars=0;if(M.bpm<end)setBpm(Math.min(end,M.bpm+step));}
+  $('ladderStatus').textContent=M.bpm>=end?`Doel bereikt: ${end} bpm. Applaus! 👏`:`Nu ${M.bpm} bpm · volgende stap over ${every-M.ladderBars} maat/maten`;
+}
+function draw(){
+  if(!M.playing)return;
+  const dots=$('dots').children;
+  while(M.queue.length&&M.queue[0].time<=ctx.currentTime){
+    const q=M.queue.shift();
+    for(let i=0;i<dots.length;i++)dots[i].classList.toggle('lit',i===q.beat);
+  }
+  requestAnimationFrame(draw);
+}
+function startMetro(useLadder){
+  if(M.playing)stopMetro();
+  stopSeq();stopChord();
+  audio();
+  M.ladder=!!useLadder&&$('ladderOn').checked;
+  if(M.ladder){setBpm(+$('lStart').value||M.bpm);M.ladderBars=0;$('ladderStatus').textContent=`Start op ${M.bpm} bpm`;}
+  M.playing=true;M.tick=0;M.queue=[];M.nextTime=ctx.currentTime+0.08;
+  M.timer=setInterval(scheduler,25);scheduler();
+  requestAnimationFrame(draw);
+  $('play').textContent='■ Stop';$('play').classList.add('stop');
+  keepAwake(true);
+}
+function stopMetro(){
+  if(!M.playing)return;
+  M.playing=false;clearInterval(M.timer);
+  [...$('dots').children].forEach(d=>d.classList.remove('lit'));
+  $('play').textContent='▶ Start';$('play').classList.remove('stop');
+  keepAwake(false);
+}
+$('play').addEventListener('click',()=>M.playing?stopMetro():startMetro(true));
+$('bpm').addEventListener('input',e=>setBpm(+e.target.value));
+document.querySelectorAll('[data-d]').forEach(b=>b.addEventListener('click',()=>setBpm(M.bpm+(+b.dataset.d))));
+$('beats').addEventListener('change',e=>{M.beats=+e.target.value;M.tick=0;buildDots();saveMetro();});
+$('sub').addEventListener('change',e=>{M.sub=+e.target.value;M.tick=0;saveMetro();});
+$('accent').addEventListener('change',e=>{M.accent=e.target.checked;buildDots();saveMetro();});
+$('vol').addEventListener('input',e=>{if(master)master.gain.value=e.target.value/100;});
+$('ladderOn').addEventListener('change',e=>{
+  M.ladderBars=0;
+  $('ladderStatus').textContent=e.target.checked?'Druk op Start: de ladder begint bij je starttempo.':'';
+  if(M.playing){M.ladder=e.target.checked;if(M.ladder)setBpm(+$('lStart').value||M.bpm);}
+});
+let taps=[];
+$('tap').addEventListener('click',()=>{
+  const t=performance.now();
+  if(taps.length&&t-taps[taps.length-1]>2000)taps=[];
+  taps.push(t);if(taps.length>5)taps.shift();
+  if(taps.length>=2)setBpm(60000/((taps[taps.length-1]-taps[0])/(taps.length-1)));
+});
+setBpm(M.bpm);buildDots();
+
+
+/* =================== STEMAPPARAAT =================== */
+function detectPitch(buf,sr,minF,maxF){
+  let data=buf,rate=sr;
+  if(minF<90){const h=new Float32Array(buf.length>>1);for(let i=0;i<h.length;i++)h[i]=(buf[2*i]+buf[2*i+1])*0.5;data=h;rate=sr/2;}
+  let rms=0;for(let i=0;i<data.length;i++)rms+=data[i]*data[i];rms=Math.sqrt(rms/data.length);
+  if(rms<0.008)return null;
+  const maxLag=Math.min(Math.floor(rate/minF),(data.length>>1)-1),minLag=Math.max(2,Math.floor(rate/maxF));
+  const W=Math.min(data.length-maxLag,Math.max(3*maxLag,1024));
+  const c=new Float32Array(maxLag+2);c[0]=1;let run=0;
+  for(let tau=1;tau<=maxLag+1;tau++){let s=0;for(let i=0;i<W;i++){const x=data[i]-data[i+tau];s+=x*x;}run+=s;c[tau]=run?s*tau/run:1;}
+  let tau=-1;
+  for(let t=minLag;t<=maxLag;t++){if(c[t]<0.15){while(t+1<=maxLag&&c[t+1]<c[t])t++;tau=t;break;}}
+  if(tau<0)return null;
+  const x0=c[tau-1],x1=c[tau],x2=c[tau+1];const den=x0+x2-2*x1;const sh=den?(x0-x2)/(2*den):0;
+  return {f:rate/(tau+sh),clarity:1-x1,rms};
+}
+(function drawGauge(){
+  const g=$('tuGauge');const cx=150,cy=160,r=125;let s='';
+  const pt=(deg,rad)=>[cx+rad*Math.sin(deg*Math.PI/180),cy-rad*Math.cos(deg*Math.PI/180)];
+  const arc=(a,b,rad,col,w)=>{const [x1,y1]=pt(a,rad),[x2,y2]=pt(b,rad);return `<path d="M${x1} ${y1} A ${rad} ${rad} 0 0 1 ${x2} ${y2}" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;};
+  s+=arc(-60,60,r,'#3a3128',14)+arc(-18,18,r,'#7a5a1c',14)+arc(-6,6,r,'#7cc48a',14);
+  for(let c=-50;c<=50;c+=10){const d=c*1.2;const [x1,y1]=pt(d,r-14),[x2,y2]=pt(d,r-(c%50===0||c===0?30:22));s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#a89a88" stroke-width="2"/>`;}
+  [[-50,'−50'],[0,'0'],[50,'+50']].forEach(([c,t])=>{const [x,y]=pt(c*1.2,r-44);s+=`<text x="${x}" y="${y+4}" fill="#a89a88" font-size="12" text-anchor="middle" font-family="system-ui">${t}</text>`;});
+  s+=`<text x="40" y="172" fill="#a89a88" font-size="12" font-family="system-ui">te laag</text><text x="260" y="172" fill="#a89a88" font-size="12" text-anchor="end" font-family="system-ui">te hoog</text>`;
+  s+=`<g id="tuNeedle" style="transform-origin:${cx}px ${cy}px"><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy-r+6}" stroke="#f5c96a" stroke-width="4" stroke-linecap="round"/></g><circle cx="${cx}" cy="${cy}" r="8" fill="#f5c96a"/>`;
+  g.innerHTML=s;
+})();
+const TU={on:false,stream:null,src:null,an:null,buf:null,iv:null,hist:[],target:0,quiet:0};
+function setNeedle(dev){const d=Math.max(-50,Math.min(50,dev))*1.2;const n=$('tuNeedle');if(n)n.style.transform=`rotate(${d}deg)`;}
+async function startTuner(){
+  stopEverything();audio();
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('tuStatus').style.color='var(--warn)';$('tuStatus').textContent='Deze browser geeft geen toegang tot de microfoon.';return;}
+  try{
+    TU.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  }catch(e){
+    $('tuStatus').style.color='var(--warn)';
+    $('tuStatus').textContent='Geen toegang tot de microfoon. Sta de microfoon toe in je browserinstellingen. (In de Claude-preview werkt dit niet: open de GitHub-versie.)';
+    return;
+  }
+  const ins=I();
+  TU.minF=hz(ins.lo+ins.t-4);TU.maxF=hz(ins.hi+ins.t+5);
+  TU.src=ctx.createMediaStreamSource(TU.stream);TU.an=ctx.createAnalyser();
+  TU.an.fftSize=TU.minF<90?8192:4096;TU.src.connect(TU.an);
+  TU.buf=new Float32Array(TU.an.fftSize);TU.hist=[];TU.quiet=0;
+  TU.on=true;keepAwake(true);TU.iv=setInterval(tunerTick,90);
+  $('tuStart').textContent='■ Stop stemapparaat';$('tuStart').classList.add('stop');
+  $('tuStatus').style.color='var(--muted)';$('tuStatus').textContent='Luistert… speel een lange toon.';
+}
+function stopTuner(){
+  if(!TU.on)return;
+  clearInterval(TU.iv);TU.on=false;
+  try{TU.src.disconnect();}catch(e){}
+  if(TU.stream)TU.stream.getTracks().forEach(t=>t.stop());
+  TU.stream=null;keepAwake(false);
+  $('tuStart').textContent='🎙️ Start stemapparaat';$('tuStart').classList.remove('stop');
+  $('tuStatus').textContent='';$('tuBig').classList.remove('tu-dim');setNeedle(0);
+}
+function tunerTick(){
+  TU.an.getFloatTimeDomainData(TU.buf);
+  const r=detectPitch(TU.buf,ctx.sampleRate,TU.minF,TU.maxF);
+  if(!r||r.clarity<0.8){
+    if(++TU.quiet>6){$('tuBig').classList.add('tu-dim');TU.hist=[];}
+    return;
+  }
+  TU.quiet=0;$('tuBig').classList.remove('tu-dim');
+  TU.hist.push(r.f);if(TU.hist.length>5)TU.hist.shift();
+  const f=TU.hist.slice().sort((a,b)=>a-b)[TU.hist.length>>1];
+  const a4=Math.max(400,Math.min(480,+cfg.a4||440));
+  const mf=69+12*Math.log2(f/a4);const m=Math.round(mf);const cents=(mf-m)*100;
+  const dev=cents-TU.target;
+  const disp=m-shift();
+  $('tuNote').textContent=nameOf(disp);
+  $('tuInfo').textContent=(shift()===0?'':'klinkt als '+nameOf(m)+' · ')+f.toFixed(1).replace('.',',')+' Hz';
+  const ad=Math.abs(dev);
+  const col=ad<5?'var(--ok)':ad<15?'var(--brass2)':'var(--warn)';
+  const txt=ad<5?'Zuiver! 👌':(dev>0?'Te hoog':'Te laag');
+  $('tuCents').innerHTML=`<span style="color:${col};font-weight:700">${dev>0?'+':''}${Math.round(dev)} cent · ${txt}</span>`+(TU.target?` <span class="muted">(doel ${TU.target>0?'+':''}${TU.target})</span>`:'');
+  setNeedle(dev);
+}
+$('tuStart').addEventListener('click',()=>TU.on?stopTuner():startTuner());
+document.querySelectorAll('#tuTarget button').forEach(b=>b.addEventListener('click',()=>{
+  TU.target=+b.dataset.v;document.querySelectorAll('#tuTarget button').forEach(x=>x.classList.toggle('on',x===b));
+}));
+
+/* =================== STEMTOON =================== */
+$('dNote').innerHTML=SP_DEF.map((x,i)=>`<option value="${i}">${nl(x[0],x[1])}</option>`).join('');
+const dSaved=store.get('bo.drone',{});
+['dNote','dOct','dTone'].forEach(k=>{if(dSaved[k]!=null)$(k).value=dSaved[k];});
+$('dFifth').checked=!!dSaved.dFifth;$('dLow').checked=!!dSaved.dLow;
+const D={nodes:[],on:false};
+function nearest(p,center){let best=null;for(let m=center-12;m<=center+12;m++)if(pc(m)===p&&(best==null||Math.abs(m-center)<Math.abs(best-center)))best=m;return best;}
+function droneDisp(){return nearest(+$('dNote').value,toDisp(64))+12*(+$('dOct').value);}
+function droneLabel(){
+  const d=droneDisp(),s=sounding(d);
+  $('dWritten').textContent=nameOf(d);
+  $('dSounds').textContent=(shift()===0?'':'klinkt als '+nameOf(s)+' · ')+hz(s).toFixed(1).replace('.',',')+' Hz';
+  store.set('bo.drone',{dNote:$('dNote').value,dOct:$('dOct').value,dTone:$('dTone').value,dFifth:$('dFifth').checked,dLow:$('dLow').checked});
+}
+function initDroneUI(){
+  const ins=I();
+  $('dInstrInfo').textContent=`Afgestemd op: ${ins.name}${isBass()?' (f-sleutel, in C)':''} · A = ${cfg.a4} Hz. Wijzig dit bij Instrument.`;
+  const q=[[10,'Stem-Bes'],[9,'Stem-A'],[5,'Stem-F']];
+  $('dQuick').innerHTML=q.map(([p,n])=>{const w=pc(p-shift());return `<button class="b" data-qp="${w}">${n}<br><span class="muted">jij speelt ${nameOf(w)}</span></button>`;}).join('');
+  $('dQuick').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('dNote').value=b.dataset.qp;$('dOct').value='0';droneLabel();startDrone();}));
+  droneLabel();
+  if(D.on)startDrone();
+}
+function makeVoice(f,level){
+  const tone=$('dTone').value,t=ctx.currentTime;
+  const g=ctx.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(level,t+0.25);
+  const oscs=[];
+  if(tone==='sine'){const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;o.connect(g);oscs.push(o);}
+  else if(tone==='warm'){
+    const o=ctx.createOscillator();o.type='triangle';o.frequency.value=f;
+    const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(8000,f*4);o.connect(fl);fl.connect(g);oscs.push(o);
+  }else{
+    [[1,1],[2,0.35],[3,0.15],[4,0.08]].forEach(([h,a])=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f*h;const ga=ctx.createGain();ga.gain.value=a;o.connect(ga);ga.connect(g);oscs.push(o);});
+  }
+  g.connect(droneBus);oscs.forEach(o=>o.start());
+  return {g,oscs};
+}
+function startDrone(){
+  stopSeq();stopChord();
+  audio();killNodes(D.nodes);D.nodes=[];
+  const s=sounding(droneDisp());
+  D.nodes.push(makeVoice(hz(s),0.35));
+  if($('dFifth').checked)D.nodes.push(makeVoice(hz(s+7),0.2));
+  if($('dLow').checked)D.nodes.push(makeVoice(hz(s-12),0.25));
+  if(!D.on){D.on=true;keepAwake(true);}
+  $('dPlay').textContent='■ Stemtoon uit';$('dPlay').classList.add('stop');
+}
+function stopDrone(){
+  killNodes(D.nodes);D.nodes=[];
+  if(D.on){D.on=false;keepAwake(false);}
+  $('dPlay').textContent='▶ Stemtoon aan';$('dPlay').classList.remove('stop');
+}
+$('dPlay').addEventListener('click',()=>D.on?stopDrone():startDrone());
+['dNote','dOct','dTone','dFifth','dLow'].forEach(id=>$(id).addEventListener('change',()=>{droneLabel();if(D.on)startDrone();}));
+$('dVol').addEventListener('input',e=>{if(droneBus)droneBus.gain.value=e.target.value/100;});
+
+/* =================== LOOP =================== */
+const au=new Audio();au.preload='auto';
+const L2={A:null,B:null,rounds:0};
+function fmt(s){if(s==null||isNaN(s))return'–';const m=Math.floor(s/60),r=s-m*60;return m+':'+(r<10?'0':'')+r.toFixed(1);}
+function fmt0(s){if(!isFinite(s))return'0:00';const m=Math.floor(s/60),r=Math.floor(s%60);return m+':'+(r<10?'0':'')+r;}
+function setRate(p){
+  au.playbackRate=p/100;au.preservesPitch=true;au.webkitPreservesPitch=true;au.mozPreservesPitch=true;
+  $('speed').value=p;$('speedVal').textContent=p+'%';
+}
+$('file').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(au.src)URL.revokeObjectURL(au.src);
+  au.src=URL.createObjectURL(f);
+  $('fileName').textContent='Geladen: '+f.name;
+  $('aPlay').disabled=false;L2.A=L2.B=null;updAB();setRate(+$('speed').value);
+});
+au.addEventListener('loadedmetadata',()=>{$('dur').textContent=fmt0(au.duration);});
+au.addEventListener('play',()=>{$('aPlay').textContent='❚❚ Pauze';$('aPlay').classList.add('stop');keepAwake(true);requestAnimationFrame(watch);});
+au.addEventListener('pause',()=>{$('aPlay').textContent='▶ Afspelen';$('aPlay').classList.remove('stop');keepAwake(false);});
+$('aPlay').addEventListener('click',()=>{
+  if(au.paused){
+    stopMetro();stopDrone();stopSeq();stopChord();
+    if($('loopOn').checked&&L2.A!=null&&L2.B!=null&&(au.currentTime<L2.A||au.currentTime>=L2.B))au.currentTime=L2.A;
+    au.play().catch(()=>{$('loopStatus').textContent='Afspelen lukte niet, probeer opnieuw te tikken.';});
+  }else au.pause();
+});
+let seeking=false;
+$('seek').addEventListener('input',e=>{seeking=true;if(au.duration)au.currentTime=e.target.value/1000*au.duration;});
+$('seek').addEventListener('change',()=>{seeking=false;});
+function watch(){
+  if(au.duration){
+    if(!seeking)$('seek').value=Math.round(au.currentTime/au.duration*1000);
+    $('cur').textContent=fmt0(au.currentTime);
+  }
+  if($('loopOn').checked&&L2.A!=null&&L2.B!=null&&L2.B>L2.A&&au.currentTime>=L2.B){
+    au.currentTime=L2.A;L2.rounds++;
+    if($('speedUp').checked)setRate(Math.min(100,+$('speed').value+5));
+    $('loopStatus').textContent=`Herhaling ${L2.rounds} · ${$('speed').value}%`;
+  }
+  if(!au.paused)requestAnimationFrame(watch);
+}
+function updAB(){$('aVal').textContent=fmt(L2.A);$('bVal').textContent=fmt(L2.B);L2.rounds=0;$('loopStatus').textContent='';}
+$('setA').addEventListener('click',()=>{L2.A=au.currentTime;if(L2.B!=null&&L2.B<=L2.A)L2.B=null;updAB();});
+$('setB').addEventListener('click',()=>{if(L2.A!=null&&au.currentTime<=L2.A)return;L2.B=au.currentTime;updAB();});
+$('clrAB').addEventListener('click',()=>{L2.A=L2.B=null;updAB();});
+document.querySelectorAll('[data-nudge]').forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.nudge,n=+b.dataset.n;if(L2[k]==null)return;
+  L2[k]=Math.max(0,Math.min(au.duration||1e9,L2[k]+n));
+  if(L2.A!=null&&L2.B!=null&&L2.B<=L2.A){if(k==='A')L2.A=L2.B-0.1;else L2.B=L2.A+0.1;}
+  updAB();
+}));
+$('speed').addEventListener('input',e=>setRate(+e.target.value));
+
+/* =================== LOGBOEK =================== */
+let log=store.get('cornet.log',[]);
+function addLog(entry){log.push(entry);store.set('cornet.log',log);renderLog();}
+const T={start:null,acc:0,iv:null};
+function elapsed(){return T.acc+(T.start?Date.now()-T.start:0);}
+function showTimer(){const s=Math.floor(elapsed()/1000);$('timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');$('mins').value=Math.round(s/60);}
+$('tStart').addEventListener('click',()=>{
+  if(T.start){T.acc+=Date.now()-T.start;T.start=null;clearInterval(T.iv);$('tStart').textContent='▶ Verder';}
+  else{T.start=Date.now();T.iv=setInterval(showTimer,500);$('tStart').textContent='❚❚ Pauze';}
+  showTimer();
+});
+$('tReset').addEventListener('click',()=>{T.start=null;T.acc=0;clearInterval(T.iv);$('tStart').textContent='▶ Timer';showTimer();});
+$('wGoal').value=store.get('cornet.goal',120);
+$('wGoal').addEventListener('change',()=>{store.set('cornet.goal',Math.max(10,+$('wGoal').value||120));renderLog();});
+function dayKey(d){const x=new Date(d);return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();}
+function renderLog(){
+  const now=new Date();const monday=new Date(now);monday.setHours(0,0,0,0);monday.setDate(monday.getDate()-((monday.getDay()+6)%7));
+  const wk=log.filter(e=>e.t>=monday.getTime()).reduce((a,e)=>a+(e.min||0),0);
+  const goal=Math.max(10,+$('wGoal').value||120);const pct=Math.round(wk/goal*100);
+  $('wMin').textContent=wk;$('wPct').textContent=pct+'%'+(pct>=100?' 🎉':'');$('wBar').style.width=Math.min(100,pct)+'%';
+  $('sTotal').textContent=log.filter(e=>e.min>0).length;
+  $('sHours').textContent=(log.reduce((a,e)=>a+(e.min||0),0)/60).toFixed(1).replace('.',',');
+  const days=new Set(log.filter(e=>e.min>0||e.bpm).map(e=>dayKey(e.t)));let streak=0;const d=new Date();
+  if(!days.has(dayKey(d)))d.setDate(d.getDate()-1);
+  while(days.has(dayKey(d))){streak++;d.setDate(d.getDate()-1);}
+  $('sStreak').textContent=streak;
+  const rec={};log.forEach(e=>{if(e.piece&&e.bpm){if(!rec[e.piece]||e.bpm>rec[e.piece].bpm)rec[e.piece]={bpm:e.bpm,t:e.t};}});
+  const keys=Object.keys(rec).sort((a,b)=>rec[b].t-rec[a].t);
+  $('records').innerHTML=keys.length?keys.map(k=>`<li><div class="main"><div>${esc(k)}</div><div class="muted">${new Date(rec[k].t).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}</div></div><span class="pill">${rec[k].bpm} bpm</span></li>`).join(''):'<li class="muted">Tik bij een toonladder of oefening op "Gehaald", of vul bij een sessie het gehaalde tempo in. Dan verschijnen hier je records.</li>';
+  const ul=$('logList');ul.innerHTML='';
+  if(!log.length)ul.innerHTML='<li class="muted">Nog niks gelogd. De eerste toon is altijd de moeilijkste.</li>';
+  log.slice().reverse().slice(0,30).forEach(e=>{
+    const li=document.createElement('li');
+    const dt=new Date(e.t).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    const parts=[dt];if(e.min)parts.push(e.min+' min');if(e.bpm)parts.push(e.bpm+' bpm');
+    li.innerHTML=`<div class="main"><div>${esc(e.piece||'Vrij oefenen')}</div><div class="muted">${parts.join(' · ')}</div><div class="muted">${esc(e.note||'')}</div></div><button class="del" title="Verwijder">✕</button>`;
+    li.querySelector('.del').addEventListener('click',()=>{log=log.filter(x=>x!==e);store.set('cornet.log',log);renderLog();});
+    ul.appendChild(li);
+  });
+  const dl=$('pieces');dl.innerHTML='';
+  [...new Set(log.map(e=>e.piece).filter(p=>p&&!p.startsWith('Routine:')))].slice(-20).forEach(p=>{const o=document.createElement('option');o.value=p;dl.appendChild(o);});
+}
+$('save').addEventListener('click',()=>{
+  const min=Math.max(0,Math.round(+$('mins').value||0));
+  if(!min&&!$('note').value.trim()&&!$('bpmDone').value){$('saveStatus').style.color='var(--warn)';$('saveStatus').textContent='Vul minuten, tempo of een notitie in.';return;}
+  addLog({t:Date.now(),piece:$('piece').value.trim(),min,bpm:+$('bpmDone').value||null,note:$('note').value.trim()});
+  $('note').value='';$('bpmDone').value='';$('tReset').click();
+  $('saveStatus').style.color='var(--ok)';$('saveStatus').textContent='Opgeslagen. Goed bezig! 🎺';
+});
+$('copy').addEventListener('click',async()=>{
+  const txt=log.map(e=>`${new Date(e.t).toLocaleDateString('nl-NL')} | ${e.piece||'Vrij oefenen'}${e.min?' | '+e.min+' min':''}${e.bpm?' | '+e.bpm+' bpm':''}${e.note?' | '+e.note:''}`).join('\n')||'(leeg logboek)';
+  try{await navigator.clipboard.writeText(txt);$('copyStatus').style.color='var(--ok)';$('copyStatus').textContent='Gekopieerd!';}
+  catch(e){$('copyStatus').style.color='var(--warn)';$('copyStatus').textContent='Kopiëren werd geblokkeerd door de browser.';}
+});
+
+/* =================== ROUTINES =================== */
+const DEFAULTS=[
+  {name:'Dagelijks (30 min)',steps:[
+    {n:'Ademhaling & buzzen op het mondstuk',m:2,tool:'none'},
+    {n:'Lange tonen op de stemtoon',m:5,tool:'drone'},
+    {n:'Lipslurs',m:5,tool:'metro',bpm:72,grow:1},
+    {n:'Toonladders & articulatie',m:5,tool:'metro',bpm:84,grow:1},
+    {n:'Techniek (Arban / Clarke)',m:5,tool:'metro',bpm:90,grow:1},
+    {n:'Concertstuk: lastige passages',m:6,tool:'none'},
+    {n:'Uitspelen: zacht en mooi',m:2,tool:'drone'}]},
+  {name:'Kort maar krachtig (15 min)',steps:[
+    {n:'Lange tonen op de stemtoon',m:4,tool:'drone'},
+    {n:'Lipslurs',m:4,tool:'metro',bpm:72,grow:1},
+    {n:'Concertstuk: één passage',m:6,tool:'none'},
+    {n:'Uitspelen',m:1,tool:'drone'}]},
+  {name:'Concertvoorbereiding (45 min)',steps:[
+    {n:'Inspelen: lange tonen',m:6,tool:'drone'},
+    {n:'Lipslurs & flexibiliteit',m:6,tool:'metro',bpm:76,grow:1},
+    {n:'Lastige passages met tempoladder',m:10,tool:'metro',bpm:80,grow:2},
+    {n:'Concertprogramma doorspelen',m:18,tool:'none'},
+    {n:'Uitspelen: zacht en mooi',m:5,tool:'drone'}]}
+];
+let routines=store.get('cornet.routines',null)||JSON.parse(JSON.stringify(DEFAULTS));
+let rIdx=Math.max(0,Math.min(store.get('cornet.rIdx',0),routines.length-1));
+function saveRoutines(){store.set('cornet.routines',routines);store.set('cornet.rIdx',rIdx);}
+const ICON={none:'🎺',drone:'🎵',metro:'⏱️'};
+const total=r=>r.steps.reduce((a,s)=>a+(+s.m||0),0);
+function renderRoutineSelect(){
+  const sel=$('rSel');sel.innerHTML='';
+  routines.forEach((r,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${r.name} · ${total(r)} min`;sel.appendChild(o);});
+  sel.value=rIdx;
+}
+function renderRoutineList(){
+  const r=routines[rIdx];const ul=$('rList');
+  ul.innerHTML=r.steps.map((s,i)=>{
+    let cls='';if(R.active){if(i<R.i)cls='done';else if(i===R.i)cls='now';}
+    return `<li class="${cls}"><span>${ICON[s.tool]||'🎺'}</span><span>${esc(s.n)}${s.tool==='metro'?` <span class="tag">${s.bpm} bpm${s.grow?' · +'+s.grow:''}</span>`:''}</span><span class="m">${s.m} min</span></li>`;
+  }).join('')||'<li class="muted">Nog geen onderdelen.</li>';
+}
+function renderEditor(){
+  const r=routines[rIdx];$('rName').value=r.name;
+  const box=$('rEdit');box.innerHTML='';
+  r.steps.forEach((s,i)=>{
+    const d=document.createElement('div');d.className='edit';
+    d.innerHTML=`<div class="row"><input type="text" value="${esc(s.n)}" data-k="n"><input type="number" min="1" max="120" value="${s.m}" data-k="m"><label>min</label></div>
+    <div class="row"><select data-k="tool"><option value="none">🎺 Vrij</option><option value="drone">🎵 Stemtoon</option><option value="metro">⏱️ Metronoom</option></select>
+    <span style="display:${s.tool==='metro'?'contents':'none'}"><input type="number" min="30" max="240" value="${s.bpm||80}" data-k="bpm"><label>bpm</label><label>groei</label><input type="number" min="0" max="10" value="${s.grow||0}" data-k="grow"></span>
+    <span style="margin-left:auto;display:flex;gap:4px"><button class="b sm" data-a="up">↑</button><button class="b sm" data-a="down">↓</button><button class="b sm" data-a="del">✕</button></span></div>`;
+    d.querySelector('[data-k=tool]').value=s.tool;
+    d.querySelectorAll('[data-k]').forEach(inp=>inp.addEventListener('change',()=>{
+      const k=inp.dataset.k;s[k]=(k==='n'||k==='tool')?inp.value:Math.max(k==='grow'?0:1,+inp.value||0);
+      if(k==='tool'){if(s.tool==='metro'&&!s.bpm)s.bpm=80;renderEditor();}
+      saveRoutines();renderRoutineSelect();renderRoutineList();
+    }));
+    d.querySelectorAll('[data-a]').forEach(btn=>btn.addEventListener('click',()=>{
+      if(R.active){$('rEditStatus').textContent='Stop eerst de routine om te schuiven of te verwijderen.';return;}
+      const a=btn.dataset.a;
+      if(a==='del')r.steps.splice(i,1);
+      else{const j=a==='up'?i-1:i+1;if(j<0||j>=r.steps.length)return;[r.steps[i],r.steps[j]]=[r.steps[j],r.steps[i]];}
+      saveRoutines();renderAll();
+    }));
+    box.appendChild(d);
+  });
+}
+function renderAll(){renderRoutineSelect();renderRoutineList();renderEditor();}
+$('rSel').addEventListener('change',e=>{if(R.active)stopRoutine(false);rIdx=+e.target.value;saveRoutines();renderAll();resetRunView();});
+$('rName').addEventListener('change',e=>{routines[rIdx].name=e.target.value.trim()||'Mijn routine';saveRoutines();renderRoutineSelect();});
+$('rAdd').addEventListener('click',()=>{routines[rIdx].steps.push({n:'Nieuw onderdeel',m:5,tool:'none'});saveRoutines();renderAll();});
+$('rNew').addEventListener('click',()=>{if(R.active)stopRoutine(false);routines.push({name:'Mijn routine',steps:[{n:'Lange tonen',m:5,tool:'drone'}]});rIdx=routines.length-1;saveRoutines();renderAll();resetRunView();$('rEditStatus').textContent='Nieuwe routine gemaakt. Pas hem hierboven aan.';});
+let delArmed=false;
+$('rDel').addEventListener('click',()=>{
+  if(routines.length<=1){$('rEditStatus').textContent='Je hebt minstens één routine nodig.';return;}
+  if(!delArmed){delArmed=true;$('rDel').textContent='Zeker weten? Tik nog eens';setTimeout(()=>{delArmed=false;$('rDel').textContent='Verwijder deze routine';},3000);return;}
+  delArmed=false;$('rDel').textContent='Verwijder deze routine';
+  if(R.active)stopRoutine(false);
+  routines.splice(rIdx,1);rIdx=0;saveRoutines();renderAll();resetRunView();
+});
+let resetArmed=false;
+$('rReset').addEventListener('click',()=>{
+  if(!resetArmed){resetArmed=true;$('rReset').textContent='Eigen routines gaan verloren. Tik nog eens';setTimeout(()=>{resetArmed=false;$('rReset').textContent='Standaardroutines terugzetten';},3000);return;}
+  resetArmed=false;$('rReset').textContent='Standaardroutines terugzetten';
+  if(R.active)stopRoutine(false);
+  routines=JSON.parse(JSON.stringify(DEFAULTS));rIdx=0;saveRoutines();renderAll();resetRunView();
+});
+const R={active:false,paused:false,i:0,left:0,stepLen:0,last:0,spent:0,iv:null};
+function mmss(ms){const s=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function resetRunView(){
+  const r=routines[rIdx];
+  $('rStepName').textContent=r.steps.length?`${r.steps.length} onderdelen · ${total(r)} minuten`:'Deze routine is nog leeg';
+  $('rTimer').textContent=mmss(total(r)*60000);$('rNext').innerHTML='&nbsp;';$('rBar').style.width='0';
+}
+function stopTools(){stopMetro();stopDrone();}
+function startStep(){
+  const r=routines[rIdx],s=r.steps[R.i];
+  R.stepLen=R.left=Math.max(1,+s.m||1)*60000;
+  stopTools();
+  if(s.tool==='metro'){setBpm(s.bpm||80);startMetro(false);}
+  else if(s.tool==='drone'&&I().kind!=='perc'){startDrone();}
+  $('rStepName').textContent=`${R.i+1}/${r.steps.length} · ${ICON[s.tool]||''} ${s.n}${s.tool==='metro'?' · '+M.bpm+' bpm':''}`;
+  const nx=r.steps[R.i+1];$('rNext').textContent=nx?'Hierna: '+nx.n:'Laatste onderdeel!';
+  renderRoutineList();updRun();
+}
+function updRun(){$('rTimer').textContent=mmss(R.left);$('rBar').style.width=(100*(1-R.left/R.stepLen))+'%';}
+function tick(){
+  const now=Date.now(),dt=now-R.last;R.last=now;
+  if(R.paused)return;
+  R.left-=dt;R.spent+=dt;
+  if(R.left<=0){chime();nextStep();}else updRun();
+}
+function nextStep(){const r=routines[rIdx];R.i++;if(R.i>=r.steps.length){finishRoutine();return;}startStep();}
+function startRoutine(){
+  const r=routines[rIdx];if(!r.steps.length)return;
+  stopEverything();audio();
+  Object.assign(R,{active:true,paused:false,i:0,spent:0,last:Date.now()});
+  R.iv=setInterval(tick,250);keepAwake(true);
+  $('rStart').textContent='■ Stop routine';$('rStart').classList.add('stop');
+  $('rPause').disabled=false;$('rSkip').disabled=false;$('rPause').textContent='❚❚ Pauze';$('rStatus').textContent='';
+  startStep();
+}
+function stopRoutine(logIt){
+  if(!R.active)return;
+  clearInterval(R.iv);stopTools();keepAwake(false);
+  const r=routines[rIdx];const done=R.i;const min=Math.round(R.spent/60000);
+  R.active=false;
+  $('rStart').textContent='▶ Start routine';$('rStart').classList.remove('stop');
+  $('rPause').disabled=true;$('rSkip').disabled=true;
+  if(logIt!==false&&min>=1){
+    addLog({t:Date.now(),piece:'Routine: '+r.name,min,bpm:null,note:`Gestopt na ${done} van ${r.steps.length} onderdelen`});
+    $('rStatus').textContent=`Gestopt. ${min} min in je logboek gezet.`;
+  }
+  renderRoutineList();resetRunView();
+}
+function finishRoutine(){
+  clearInterval(R.iv);stopTools();keepAwake(false);
+  const r=routines[rIdx];const min=Math.max(1,Math.round(R.spent/60000));
+  const grown=[];
+  r.steps.forEach(s=>{if(s.tool==='metro'&&s.grow>0){s.bpm=Math.min(240,(s.bpm||80)+s.grow);grown.push(`${s.n} → ${s.bpm}`);}});
+  saveRoutines();
+  addLog({t:Date.now(),piece:'Routine: '+r.name,min,bpm:null,note:'Volledig afgerond'+(grown.length?' · volgende keer: '+grown.join(', '):'')});
+  R.active=false;
+  $('rStart').textContent='▶ Start routine';$('rStart').classList.remove('stop');
+  $('rPause').disabled=true;$('rSkip').disabled=true;
+  renderAll();resetRunView();
+  $('rStepName').textContent='Routine afgerond! 🎉';
+  $('rStatus').textContent=`${min} min gelogd.`+(grown.length?' De tempo\'s gaan volgende keer een tikje omhoog.':'');
+}
+$('rStart').addEventListener('click',()=>R.active?stopRoutine(true):startRoutine());
+$('rPause').addEventListener('click',()=>{
+  if(!R.active)return;
+  R.paused=!R.paused;R.last=Date.now();
+  const s=routines[rIdx].steps[R.i];
+  if(R.paused){stopTools();$('rPause').textContent='▶ Verder';$('rStatus').textContent='Gepauzeerd. Even de lippen laten rusten.';}
+  else{if(s.tool==='metro')startMetro(false);else if(s.tool==='drone'&&I().kind!=='perc')startDrone();$('rPause').textContent='❚❚ Pauze';$('rStatus').textContent='';}
+});
+$('rSkip').addEventListener('click',()=>{if(R.active){R.paused=false;$('rPause').textContent='❚❚ Pauze';nextStep();}});
+
+/* =================== START =================== */
+if(!cfg.instr){$('firstRun').style.display='';}
+applyInstrument();
+renderLog();showTimer();renderAll();resetRunView();
+let rsT=null;window.addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{const on=document.querySelector('main>section.on');if(!on)return;if(on.id==='toonladders')renderScale();if(on.id==='akkoorden')renderChord();if(on.id==='inblazen')renderExercise();},300);});
+if(location.hash.length>1)go(location.hash.slice(1));
+if('serviceWorker' in navigator&&location.protocol==='https:'&&!/claude\.ai|claudeusercontent/.test(location.hostname)){
+  window.addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}});
+}
+})();
+</script>
+</body>
+</html>
