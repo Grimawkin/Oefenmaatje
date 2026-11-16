@@ -147,7 +147,7 @@ ul.help li+li{margin-top:8px}
     <button class="tile" data-go="instrument"><i>⚙️</i>Instrument<span>Instellingen</span></button>
     <button class="tile" data-go="hulp"><i>❓</i>Handleiding<span>Zo werkt de app</span></button>
   </div>
-  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 8 · 15 november 2026</p>
+  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 9 · 16 november 2026</p>
 </section>
 
 <!-- HANDLEIDING -->
@@ -167,6 +167,7 @@ ul.help li+li{margin-top:8px}
       <li><b>Notatie:</b> baritons, trombones, euphoniums en bassen kiezen tussen <b>g-sleutel</b> (brassband) en <b>f-sleutel in C</b>.</li>
       <li><b>Niveau:</b> Basis (toonladders over één octaaf) of Gevorderd (twee octaven).</li>
       <li><b>Stemming:</b> standaard A = 442 Hz. Pas dit aan als je band op een andere stemming speelt.</li>
+      <li><b>Lage tonen hoger afspelen:</b> staat standaard aan, zodat stemtoon en akkoorden goed hoorbaar zijn via een telefoon- of tabletspeaker. Met een koptelefoon kun je het uitzetten.</li>
     </ul>
   </div>
   <div class="card">
@@ -187,7 +188,7 @@ ul.help li+li{margin-top:8px}
   <div class="card">
     <h2>Tips en veelgestelde vragen</h2>
     <ul class="help">
-      <li><b>Het geluid is te zacht.</b> Zet het volume van je telefoon of tablet zelf hoger. Bij de metronoom en de stemtoon zitten ook volumeschuiven.</li>
+      <li><b>Het geluid is te zacht.</b> Zet het volume van je telefoon of tablet zelf hoger. Bij de metronoom en de stemtoon zitten ook volumeschuiven. Klinken stemtoon of akkoorden dof, controleer dan of <i>Lage tonen hoger afspelen</i> aan staat bij Instrument.</li>
       <li><b>Het stemapparaat doet niets.</b> Sta de microfoon toe als de browser erom vraagt. Heb je eerder "Niet toestaan" gekozen, zet de microfoon dan aan in de instellingen van je browser.</li>
       <li><b>Heb ik de nieuwste versie?</b> Onderaan het startscherm staat het versienummer. Een update komt binnen als je de app helemaal sluit en weer opent. Soms moet dat twee keer.</li>
       <li><b>Waar blijven mijn gegevens?</b> Je logboek, routines en instellingen staan alleen op je eigen apparaat. Er gaat niets naar een server.</li>
@@ -218,6 +219,10 @@ ul.help li+li{margin-top:8px}
     <div class="row">
       <label>Stemming A =</label><input type="number" id="iA4" value="442" min="430" max="450"><label>Hz</label>
     </div>
+    <div class="row">
+      <label class="check"><input type="checkbox" id="iLift" checked> Lage tonen hoger afspelen</label>
+    </div>
+    <p class="muted" style="margin:6px 0 0">Telefoon- en tabletspeakers geven lage tonen nauwelijks weer. Met dit vinkje speelt de app stemtoon, akkoorden en voorbeelden zo nodig een of meer octaven hoger. Stemmen op gehoor werkt net zo goed. Gebruik je een koptelefoon of een goede speaker, dan kun je het uitzetten.</p>
   </div>
   <div class="card">
     <h2>Zo is alles nu ingesteld</h2>
@@ -430,7 +435,7 @@ ul.help li+li{margin-top:8px}
       <label class="check"><input type="checkbox" id="dFifth"> + kwint</label>
       <label class="check"><input type="checkbox" id="dLow"> + octaaf lager</label>
     </div>
-    <div class="row"><label>Volume</label><input type="range" id="dVol" min="0" max="100" value="75"></div>
+    <div class="row"><label>Volume</label><input type="range" id="dVol" min="0" max="100" value="90"></div>
     <p class="muted" style="margin:10px 0 0" id="dInstrInfo"></p>
   </div>
   <div class="card">
@@ -555,7 +560,7 @@ const INSTR=[
   {id:'ebb',name:'Es-bas',short:'Es-bas',t:-21,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'},
   {id:'bbb',name:'Bes-bas',short:'Bes-bas',t:-26,kind:'valves',lo:54,hi:76,clefs:['treble','bass'],ic:'📯'}
 ];
-let cfg=Object.assign({instr:null,clef:'treble',level:1,a4:442},store.get('bo.cfg',{}));
+let cfg=Object.assign({instr:null,clef:'treble',level:1,a4:442,lift:true},store.get('bo.cfg',{}));
 // eenmalig: oude standaard 440 → nieuwe standaard 442
 if(!cfg.v2){if(+cfg.a4===440)cfg.a4=442;cfg.v2=true;try{localStorage.setItem('bo.cfg',JSON.stringify(cfg));}catch(e){}}
 if(cfg.instr&&!INSTR.some(x=>x.id===cfg.instr))cfg.instr=null; // bv. oud 'slagwerk'
@@ -567,6 +572,8 @@ const toTw=d=>isBass()?d-I().t:d;
 const sounding=d=>d+shift();
 function hz(m){const a=Math.max(400,Math.min(480,+cfg.a4||442));return a*Math.pow(2,(m-69)/12);}
 function saveCfg(){store.set('bo.cfg',cfg);}
+// aantal octaven omhoog zodat de laagste klinkende toon minstens ~185 Hz (Fis3) is
+function liftOct(m){return cfg.lift===false?0:Math.max(0,Math.ceil((54-m)/12));}
 
 /* =================== NOTENNAMEN =================== */
 const NAT={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -830,7 +837,7 @@ function applyInstrument(){
   $('iClefRow').style.display=ins.clefs.length>1?'':'none';
   document.querySelectorAll('#iClef button').forEach(b=>b.classList.toggle('on',b.dataset.v===cfg.clef));
   document.querySelectorAll('#iLevel button').forEach(b=>b.classList.toggle('on',+b.dataset.v===+cfg.level));
-  $('iA4').value=cfg.a4;
+  $('iA4').value=cfg.a4;$('iLift').checked=cfg.lift!==false;
   const perc=ins.kind==='perc';
   const clefTxt=isBass()?'f-sleutel, in C (je leest wat klinkt)':'g-sleutel';
   $('badgeName').textContent=ins.name;
@@ -853,6 +860,7 @@ function applyInstrument(){
 $('iSel').addEventListener('change',e=>{cfg.instr=e.target.value;cfg.clef=I().clefs[0];stopEverything();applyInstrument();});
 document.querySelectorAll('#iClef button').forEach(b=>b.addEventListener('click',()=>{cfg.clef=b.dataset.v;stopEverything();applyInstrument();}));
 document.querySelectorAll('#iLevel button').forEach(b=>b.addEventListener('click',()=>{cfg.level=+b.dataset.v;applyInstrument();}));
+$('iLift').addEventListener('change',e=>{cfg.lift=e.target.checked;saveCfg();if(D.on)startDrone();if(C.on)startChord();droneLabel();});
 $('iA4').addEventListener('change',e=>{cfg.a4=Math.max(430,Math.min(450,+e.target.value||442));applyInstrument();});
 $('frOk').addEventListener('click',()=>{cfg.instr=$('frInstr').value;cfg.clef=I().clefs[0];$('firstRun').style.display='none';applyInstrument();});
 
@@ -864,9 +872,10 @@ function playSeq(seq,o){
   const beat=60/o.bpm;let t=ctx.currentTime+0.12;
   if(o.countIn){for(let i=0;i<4;i++)click(t+i*beat,i===0?0:1,P.bus);t+=4*beat;}
   const start=t;P.times=[];let b=0;
+  const ms=seq.filter(x=>!x.rest).map(x=>sounding(x.m));const up=ms.length?12*liftOct(Math.min(...ms)):0;
   seq.forEach(it=>{
     const when=start+b*beat;P.times.push(when);
-    if(!it.rest&&o.tone)brass(hz(sounding(it.m)),when,it.d*beat,P.bus);
+    if(!it.rest&&o.tone)brass(hz(sounding(it.m)+up),when,it.d*beat,P.bus);
     b+=it.d;
   });
   if(o.click)for(let i=0;i<Math.ceil(b);i++)click(start+i*beat,1,P.bus);
@@ -1062,7 +1071,7 @@ function voiceSus(f,level){
   const t=ctx.currentTime,g=ctx.createGain();
   g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(level,t+0.3);
   const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=f;
-  const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(7000,f*6);
+  const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(9000,f*9);
   o.connect(fl);fl.connect(g);g.connect(droneBus);o.start();
   return {g,oscs:[o]};
 }
@@ -1070,7 +1079,7 @@ function killNodes(arr){if(!ctx)return;const t=ctx.currentTime;arr.forEach(v=>{v
 function startChord(){
   const wasOn=C.on;stopMetro();stopDrone();stopSeq();if(!au.paused)au.pause();
   audio();killNodes(C.nodes);C.nodes=[];
-  const root=curChord[0];const f0=hz(sounding(root.m));
+  const root=curChord[0];const f0=hz(sounding(root.m)+12*liftOct(sounding(root.m)-12));
   C.nodes.push(voiceSus(f0/2,0.55));
   curChord.slice(0,-1).forEach((n,i)=>{if(i!==cState.role)C.nodes.push(voiceSus(f0*RATIO[n.iv],0.45));});
   if(!wasOn){C.on=true;keepAwake(true);}
@@ -1084,7 +1093,7 @@ function stopChord(){
 $('cBand').addEventListener('click',()=>C.on?stopChord():startChord());
 $('cCompare').addEventListener('click',()=>{
   stopEverything();audio();
-  const root=curChord[0];const f0=hz(sounding(root.m));const t=ctx.currentTime+0.1;
+  const root=curChord[0];const f0=hz(sounding(root.m)+12*liftOct(sounding(root.m)-12));const t=ctx.currentTime+0.1;
   const play=(start,just)=>{
     const g=ctx.createGain();g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(0.4,start+0.2);g.gain.setTargetAtTime(0.0001,start+2.4,0.1);g.connect(droneBus);
     [f0/2].concat(curChord.slice(0,-1).map(n=>just?f0*RATIO[n.iv]:f0*Math.pow(2,n.iv/12))).forEach(f=>{
@@ -1347,7 +1356,8 @@ function droneDisp(){return nearest(+$('dNote').value,toDisp(64))+12*(+$('dOct')
 function droneLabel(){
   const d=droneDisp(),s=sounding(d);
   $('dWritten').textContent=nameOf(d);
-  $('dSounds').textContent=(shift()===0?'':'klinkt als '+nameOf(s)+' · ')+hz(s).toFixed(1).replace('.',',')+' Hz';
+  const lo=liftOct($('dLow').checked?s-12:s);
+  $('dSounds').textContent=(shift()===0?'':'klinkt als '+nameOf(s)+' · ')+hz(s).toFixed(1).replace('.',',')+' Hz'+(lo?` · afgespeeld ${lo} octaaf hoger`:'');
   store.set('bo.drone',{dNote:$('dNote').value,dOct:$('dOct').value,dTone:$('dTone').value,dFifth:$('dFifth').checked,dLow:$('dLow').checked});
 }
 function initDroneUI(){
@@ -1376,7 +1386,7 @@ function makeVoice(f,level){
 function startDrone(){
   stopSeq();stopChord();
   audio();killNodes(D.nodes);D.nodes=[];
-  const s=sounding(droneDisp());
+  let s=sounding(droneDisp());s+=12*liftOct($('dLow').checked?s-12:s);
   D.nodes.push(makeVoice(hz(s),0.6));
   if($('dFifth').checked)D.nodes.push(makeVoice(hz(s+7),0.35));
   if($('dLow').checked)D.nodes.push(makeVoice(hz(s-12),0.45));
