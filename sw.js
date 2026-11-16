@@ -1,6 +1,6 @@
 // Brassband Oefenmaatje – service worker
 // Verhoog VERSIE bij elke update, dan halen alle telefoons de nieuwe versie op.
-const VERSIE = 'oefenmaatje-v9';
+const VERSIE = 'oefenmaatje-v10';
 const BESTANDEN = ['./', './index.html', './manifest.json', './icon-180.png', './icon-192.png', './icon-512.png', './icon-512-maskable.png'];
 
 self.addEventListener('install', e => {
@@ -19,7 +19,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' }) // altijd bij de server nagaan of er een nieuwe versie is
       .then(res => {
         const kopie = res.clone();
         caches.open(VERSIE).then(c => c.put(e.request, kopie));
