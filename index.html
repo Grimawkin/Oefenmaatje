@@ -123,6 +123,9 @@ ul.help li+li{margin-top:8px}
 
 <!-- START -->
 <section id="home" class="on">
+  <div class="seg" id="modeSeg" style="margin-bottom:12px" role="group" aria-label="Weergave">
+    <button data-m="full" class="on">Uitgebreid</button><button data-m="simple">Eenvoudig</button>
+  </div>
   <div class="card" id="firstRun" style="display:none">
     <h2>Welkom! Welk instrument speel je?</h2>
     <p class="muted" style="margin:0 0 10px">Toonladders, grepen, stemtoon en oefeningen worden daarop afgestemd.</p>
@@ -138,16 +141,16 @@ ul.help li+li{margin-top:8px}
     <button class="tile" data-go="routine"><i>📋</i>Routine<span>Oefenen met plan en timer</span></button>
     <button class="tile pitch" data-go="inblazen"><i>🌬️</i>Inblazen<span>Lange tonen en lipslurs</span></button>
     <button class="tile pitch" data-go="toonladders"><i>🎼</i>Toonladders<span>Met noten en grepen</span></button>
-    <button class="tile pitch" data-go="akkoorden"><i>🎶</i>Akkoorden<span>Zuiver spelen: terts en kwint</span></button>
-    <button class="tile pitch" data-go="tuner"><i>🎯</i>Stemapparaat<span>Met naald, via de microfoon</span></button>
-    <button class="tile pitch" data-go="drone"><i>🎵</i>Stemtoon<span>Stemmen op gehoor</span></button>
-    <button class="tile" data-go="metro"><i>⏱️</i>Metronoom<span>Met tempoladder</span></button>
+    <button class="tile pitch" data-go="akkoorden" data-basic="1"><i>🎶</i>Akkoorden<span>Zuiver spelen: terts en kwint</span></button>
+    <button class="tile pitch" data-go="tuner" data-basic="1"><i>🎯</i>Stemapparaat<span>Met naald, via de microfoon</span></button>
+    <button class="tile pitch" data-go="drone" data-basic="1"><i>🎵</i>Stemtoon<span>Stemmen op gehoor</span></button>
+    <button class="tile" data-go="metro" data-basic="1"><i>⏱️</i>Metronoom<span>Met tempoladder</span></button>
     <button class="tile" data-go="loop"><i>🔁</i>Loop<span>Opname vertragen en herhalen</span></button>
     <button class="tile" data-go="log"><i>📒</i>Logboek<span>Weekdoel en records</span></button>
     <button class="tile" data-go="instrument"><i>⚙️</i>Instrument<span>Instellingen</span></button>
     <button class="tile" data-go="hulp"><i>❓</i>Handleiding<span>Zo werkt de app</span></button>
   </div>
-  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 10 · 16 november 2026</p>
+  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 11 · 17 november 2026</p>
 </section>
 
 <!-- HANDLEIDING -->
@@ -158,6 +161,12 @@ ul.help li+li{margin-top:8px}
     <ul class="help">
       <li><b>iPhone/iPad:</b> open de app in Safari, tik op de deelknop en kies <b>Zet op beginscherm</b>.</li>
       <li><b>Android:</b> open de app in Chrome, tik op het menu (⋮) en kies <b>App installeren</b>.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Uitgebreid of eenvoudig</h2>
+    <ul class="help">
+      <li>Bovenaan het startscherm kies je <b>Uitgebreid</b> (alle onderdelen) of <b>Eenvoudig</b> (alleen Akkoorden, Stemapparaat, Stemtoon en Metronoom). De app onthoudt je keuze.</li>
     </ul>
   </div>
   <div class="card">
@@ -579,6 +588,13 @@ const toDisp=tw=>isBass()?tw+I().t:tw;        // g-sleutelnotatie -> eigen notat
 const toTw=d=>isBass()?d-I().t:d;
 const sounding=d=>d+shift();
 function hz(m){const a=Math.max(400,Math.min(480,+cfg.a4||442));return a*Math.pow(2,(m-69)/12);}
+function setMode(m){
+  m=m==='simple'?'simple':'full';store.set('bo.mode',m);
+  document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  document.querySelectorAll('.tiles .tile').forEach(t=>{t.style.display=(m==='simple'&&!t.dataset.basic)?'none':'';});
+}
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+setMode(store.get('bo.mode','full'));
 function saveCfg(){store.set('bo.cfg',cfg);}
 // aantal octaven omhoog zodat de laagste klinkende toon minstens ~185 Hz (Fis3) is
 function liftOct(m){return cfg.lift===false?0:Math.max(0,Math.ceil((54-m)/12));}
