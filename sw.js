@@ -1,6 +1,6 @@
 // Brassband Oefenmaatje – service worker
 // Verhoog VERSIE bij elke update, dan halen alle telefoons de nieuwe versie op.
-const VERSIE = 'oefenmaatje-v14';
+const VERSIE = 'oefenmaatje-v15';
 const BESTANDEN = ['./', './index.html', './manifest.json', './icon-180.png', './icon-192.png', './icon-512.png', './icon-512-maskable.png'];
 
 self.addEventListener('install', e => {
