@@ -150,7 +150,7 @@ ul.help li+li{margin-top:8px}
     <button class="tile" data-go="instrument"><i>⚙️</i>Instrument<span>Instellingen</span></button>
     <button class="tile" data-go="hulp"><i>❓</i>Handleiding<span>Zo werkt de app</span></button>
   </div>
-  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 11 · 17 november 2026</p>
+  <p class="muted" style="text-align:center;margin-top:18px">Oefenmaatje voor brassband Euphonia · gemaakt door Rudi<br>Versie 12 · 17 november 2026</p>
 </section>
 
 <!-- HANDLEIDING -->
@@ -176,6 +176,7 @@ ul.help li+li{margin-top:8px}
       <li><b>Notatie:</b> baritons, trombones, euphoniums en bassen kiezen tussen <b>g-sleutel</b> (brassband) en <b>f-sleutel in C</b>.</li>
       <li><b>Niveau:</b> Basis (toonladders over één octaaf) of Gevorderd (twee octaven).</li>
       <li><b>Stemming:</b> standaard A = 442 Hz. Pas dit aan als je band op een andere stemming speelt.</li>
+      <li><b>Natuurlijkere klank:</b> staat standaard aan. Toonladders en oefeningen klinken dan meer als een echte blazer, met een zachte aanzet en een lichte trilling per instrument. Zet het uit om de oude, eenvoudige klank te horen.</li>
       <li><b>Lage tonen hoger afspelen:</b> staat standaard aan, zodat stemtoon en akkoorden goed hoorbaar zijn via een telefoon- of tabletspeaker. Met een koptelefoon kun je het uitzetten.</li>
     </ul>
   </div>
@@ -230,6 +231,7 @@ ul.help li+li{margin-top:8px}
     </div>
     <div class="row">
       <label class="check"><input type="checkbox" id="iLift" checked> Lage tonen hoger afspelen</label>
+      <label class="check"><input type="checkbox" id="iNat" checked> Natuurlijkere klank bij toonladders en oefeningen</label>
     </div>
     <p class="muted" style="margin:6px 0 0">Telefoon- en tabletspeakers geven lage tonen nauwelijks weer. Met dit vinkje speelt de app stemtoon, akkoorden en voorbeelden zo nodig een of meer octaven hoger. Stemmen op gehoor werkt net zo goed. Gebruik je een koptelefoon of een goede speaker, dan kun je het uitzetten.</p>
   </div>
@@ -794,18 +796,57 @@ function click(time,kind,dest){
   g.gain.exponentialRampToValueAtTime(0.0001,time+0.05);
   o.connect(g);g.connect(dest||master);o.start(time);o.stop(time+0.06);
 }
+let noiseBuf=null;
+function noise(){if(noiseBuf)return noiseBuf;const n=ctx.sampleRate*0.1|0;noiseBuf=ctx.createBuffer(1,n,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;return noiseBuf;}
+// klankkleur per instrument: aanzet (s), filter piek/rust (x grondtoon), klankkast (Hz), vibrato (cents)
+function timbre(){
+  const id=I().id;
+  if(id==='sop'||id==='cor')return{at:.045,pk:6,su:3.2,fm:1300,vib:5};
+  if(id==='bug')return{at:.05,pk:4.5,su:2.6,fm:1000,vib:5};
+  if(id==='alt')return{at:.055,pk:4.2,su:2.6,fm:900,vib:4.5};
+  if(id==='bar'||id==='eup')return{at:.06,pk:3.6,su:2.3,fm:750,vib:4.5};
+  if(id==='tbn')return{at:.05,pk:4,su:2.4,fm:800,vib:3.5};
+  return{at:.075,pk:2.8,su:1.8,fm:520,vib:3};
+}
 function brass(freq,time,dur,dest,level){
-  const o=ctx.createOscillator(),g=ctx.createGain(),fl=ctx.createBiquadFilter();
-  const d=Math.max(0.06,dur*0.92);
-  o.type='sawtooth';o.frequency.value=freq;
-  fl.type='lowpass';fl.Q.value=0.8;
-  fl.frequency.setValueAtTime(Math.min(8000,freq*1.5),time);fl.frequency.linearRampToValueAtTime(Math.min(10000,freq*4),time+0.08);
-  const L=level||0.5;
+  const L=level||0.5,d=Math.max(0.06,dur*0.92);
+  if(cfg.nat===false){ // eenvoudige klank (zoals voorheen)
+    const o=ctx.createOscillator(),g=ctx.createGain(),fl=ctx.createBiquadFilter();
+    o.type='sawtooth';o.frequency.value=freq;fl.type='lowpass';fl.Q.value=0.8;
+    fl.frequency.setValueAtTime(Math.min(8000,freq*1.5),time);fl.frequency.linearRampToValueAtTime(Math.min(10000,freq*4),time+0.08);
+    g.gain.setValueAtTime(0.0001,time);g.gain.exponentialRampToValueAtTime(L,time+0.03);
+    g.gain.setTargetAtTime(L*0.75,time+0.03,0.15);g.gain.setTargetAtTime(0.0001,time+d,0.03);
+    o.connect(fl);fl.connect(g);g.connect(dest);o.start(time);o.stop(time+d+0.3);return;
+  }
+  const T=timbre(),end=time+d;
+  const g=ctx.createGain(),fl=ctx.createBiquadFilter(),fm=ctx.createBiquadFilter();
+  fl.type='lowpass';fl.Q.value=1.1;
+  const top=v=>Math.min(9500,Math.max(300,freq*v));
+  fl.frequency.setValueAtTime(top(1.3),time);
+  fl.frequency.exponentialRampToValueAtTime(top(T.pk),time+T.at);
+  fl.frequency.setTargetAtTime(top(T.su),time+T.at,0.12);
+  fm.type='peaking';fm.frequency.value=T.fm;fm.Q.value=1.2;fm.gain.value=5;
   g.gain.setValueAtTime(0.0001,time);
-  g.gain.exponentialRampToValueAtTime(L,time+0.03);
-  g.gain.setTargetAtTime(L*0.75,time+0.03,0.15);
-  g.gain.setTargetAtTime(0.0001,time+d,0.03);
-  o.connect(fl);fl.connect(g);g.connect(dest);o.start(time);o.stop(time+d+0.3);
+  g.gain.exponentialRampToValueAtTime(L*0.9,time+T.at);
+  g.gain.setTargetAtTime(L*0.68,time+T.at,0.18);
+  g.gain.setTargetAtTime(0.0001,end,0.04);
+  fl.connect(fm);fm.connect(g);g.connect(dest);
+  // twee licht verstemde oscillatoren = levendiger dan één
+  const vg=ctx.createGain();vg.gain.setValueAtTime(0,time);
+  if(d>0.45){vg.gain.setValueAtTime(0,time+0.2);vg.gain.linearRampToValueAtTime(T.vib,time+0.6);}
+  const lfo=ctx.createOscillator();lfo.frequency.value=5.2;lfo.connect(vg);lfo.start(time);lfo.stop(end+0.3);
+  [-2.5,2.5].forEach(c=>{
+    const o=ctx.createOscillator(),og=ctx.createGain();o.type='sawtooth';og.gain.value=0.55;
+    o.frequency.setValueAtTime(freq*Math.pow(2,-18/1200),time);        // kleine "scoop" naar de toon
+    o.frequency.exponentialRampToValueAtTime(freq,time+0.045);
+    o.detune.value=c;vg.connect(o.detune);
+    o.connect(og);og.connect(fl);o.start(time);o.stop(end+0.3);
+  });
+  // zacht ademgeluid bij de aanzet
+  const ns=ctx.createBufferSource();ns.buffer=noise();
+  const nf=ctx.createBiquadFilter();nf.type='bandpass';nf.frequency.value=Math.min(4000,freq*3);nf.Q.value=0.8;
+  const ng=ctx.createGain();ng.gain.setValueAtTime(L*0.22,time);ng.gain.exponentialRampToValueAtTime(0.0001,time+0.07);
+  ns.connect(nf);nf.connect(ng);ng.connect(dest);ns.start(time);ns.stop(time+0.08);
 }
 function chime(){
   audio();const t=ctx.currentTime+0.02;
@@ -869,7 +910,7 @@ function applyInstrument(){
   $('iClefRow').style.display=ins.clefs.length>1?'':'none';
   document.querySelectorAll('#iClef button').forEach(b=>b.classList.toggle('on',b.dataset.v===cfg.clef));
   document.querySelectorAll('#iLevel button').forEach(b=>b.classList.toggle('on',+b.dataset.v===+cfg.level));
-  $('iA4').value=cfg.a4;$('iLift').checked=cfg.lift!==false;
+  $('iA4').value=cfg.a4;$('iLift').checked=cfg.lift!==false;$('iNat').checked=cfg.nat!==false;
   const perc=ins.kind==='perc';
   const clefTxt=isBass()?'f-sleutel, in C (je leest wat klinkt)':'g-sleutel';
   $('badgeName').textContent=ins.name;
@@ -892,6 +933,7 @@ function applyInstrument(){
 $('iSel').addEventListener('change',e=>{cfg.instr=e.target.value;cfg.clef=I().clefs[0];stopEverything();applyInstrument();});
 document.querySelectorAll('#iClef button').forEach(b=>b.addEventListener('click',()=>{cfg.clef=b.dataset.v;stopEverything();applyInstrument();}));
 document.querySelectorAll('#iLevel button').forEach(b=>b.addEventListener('click',()=>{cfg.level=+b.dataset.v;applyInstrument();}));
+$('iNat').addEventListener('change',e=>{cfg.nat=e.target.checked;saveCfg();});
 $('iLift').addEventListener('change',e=>{cfg.lift=e.target.checked;saveCfg();if(D.on)startDrone();if(C.on)startChord();droneLabel();});
 $('iA4').addEventListener('change',e=>{cfg.a4=Math.max(430,Math.min(450,+e.target.value||442));applyInstrument();});
 $('frOk').addEventListener('click',()=>{cfg.instr=$('frInstr').value;cfg.clef=I().clefs[0];$('firstRun').style.display='none';applyInstrument();});
